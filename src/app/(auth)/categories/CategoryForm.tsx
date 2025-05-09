@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Button from '@/components/Button';
+import { Input, Select, FormGroup } from '@/components/form';
 import { Category, TransactionType } from '@/types';
 
 interface CategoryFormProps {
@@ -40,8 +41,7 @@ export default function CategoryForm({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+  const handleChange = (name: string, value: any) => {
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -78,103 +78,92 @@ export default function CategoryForm({
     }
   };
 
+  // Prepare options for select component
+  const typeOptions = [
+    { value: 'expense', label: 'Expense' },
+    { value: 'income', label: 'Income' },
+  ];
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-      {/* Name */}
-      <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Category Name
-        </label>
-        <input
-          type="text"
+    <form onSubmit={handleSubmit} className="space-y-5 mt-4">
+      <FormGroup>
+        {/* Name */}
+        <Input
           id="name"
           name="name"
+          label="Category Name"
           value={formData.name}
-          onChange={handleChange}
-          className={`mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
-            errors.name ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''
-          }`}
+          onChange={(e) => handleChange('name', e.target.value)}
+          error={errors.name}
           placeholder="e.g., Groceries, Rent, Salary"
         />
-        {errors.name && (
-          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name}</p>
-        )}
-      </div>
 
-      {/* Type */}
-      <div>
-        <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Category Type
-        </label>
-        <select
+        {/* Type */}
+        <Select
           id="type"
           name="type"
+          label="Category Type"
           value={formData.type}
-          onChange={handleChange}
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-        >
-          <option value="expense">Expense</option>
-          <option value="income">Income</option>
-        </select>
-      </div>
+          options={typeOptions}
+          onChange={(value) => handleChange('type', value)}
+        />
 
-      {/* Color */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Color
-        </label>
-        <div className="flex flex-wrap gap-2">
-          {colorPalette.map(color => (
-            <button
-              key={color}
-              type="button"
-              onClick={() => handleColorSelect(color)}
-              className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                formData.color === color ? 'ring-2 ring-offset-2 ring-green-500' : ''
-              }`}
-              style={{ backgroundColor: color }}
-            >
-              {formData.color === color && (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              )}
-            </button>
-          ))}
+        {/* Color */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Color
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {colorPalette.map(color => (
+              <button
+                key={color}
+                type="button"
+                onClick={() => handleColorSelect(color)}
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  formData.color === color ? 'ring-2 ring-offset-2 ring-green-500' : ''
+                }`}
+                style={{ backgroundColor: color }}
+              >
+                {formData.color === color && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                )}
+              </button>
+            ))}
+          </div>
+          {errors.color && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.color}</p>}
         </div>
-        {errors.color && (
-          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.color}</p>
-        )}
-      </div>
 
-      {/* Preview */}
-      <div className="mt-4">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Preview
-        </label>
-        <div className="border dark:border-gray-700 p-3 rounded-md">
-          <div className="flex items-center">
-            <div
-              className="w-8 h-8 rounded-full mr-3"
-              style={{ backgroundColor: formData.color }}
-            />
-            <span className="text-gray-900 dark:text-white font-medium">
-              {formData.name || 'Category Name'}
-            </span>
+        {/* Preview */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Preview
+          </label>
+          <div className="border dark:border-gray-700 p-3 rounded-md">
+            <div className="flex items-center">
+              <div
+                className="w-8 h-8 rounded-full mr-3"
+                style={{ backgroundColor: formData.color }}
+              />
+              <span className="text-gray-900 dark:text-white font-medium">
+                {formData.name || 'Category Name'}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
+      </FormGroup>
 
       {/* Actions */}
       <div className="flex justify-end space-x-3 pt-4">
