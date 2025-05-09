@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -15,16 +15,18 @@ import {
 import { Line, Bar, Pie, Doughnut } from 'react-chartjs-2';
 
 // Register ChartJS components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  Tooltip,
-  Legend
-);
+if (typeof window !== 'undefined') {
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    ArcElement,
+    Tooltip,
+    Legend
+  );
+}
 
 export type ChartType = 'line' | 'bar' | 'pie' | 'doughnut';
 
@@ -45,6 +47,12 @@ export default function ChartComponent({
   width,
   className = '',
 }: ChartComponentProps) {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   // Default options for charts
   const defaultOptions = {
     responsive: true,
@@ -60,6 +68,8 @@ export default function ChartComponent({
 
   // Render different chart types
   const renderChart = () => {
+    if (!isClient) return null;
+    
     switch (type) {
       case 'line':
         return <Line data={data} options={mergedOptions} />;
