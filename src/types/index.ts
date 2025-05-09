@@ -11,7 +11,7 @@ export interface Transaction {
 }
 
 export interface Category {
-  id: string;
+  id: number;
   name: string;
   type: TransactionType;
   color: string;

@@ -18,20 +18,34 @@ export default function CategoriesPage() {
   const filteredCategories = categories.filter(category => category.type === activeTab);
 
   // Handle new category
-  const handleAddCategory = (category: Partial<Category>) => {
+  const handleAddCategory = async (category: Partial<Category>) => {
     if (editingCategory) {
       // Update existing category
-      const updatedCategories = categories.map(c => 
+      const updatedCategories = categories.map(c =>
         c.id === editingCategory.id ? { ...category, id: editingCategory.id } as Category : c
       );
       setCategories(updatedCategories);
     } else {
       // Add new category with generated ID
-      const newCategory = {
-        ...category,
-        id: `cat-${Date.now()}`,
-      } as Category;
-      setCategories([...categories, newCategory]);
+      await fetch('/api/categories/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(category),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            console.error('Error adding category:', data.error);
+          } else {
+            const newCategory = {
+              ...category,
+              id: `cat-${Date.now()}`,
+            } as Category;
+            setCategories([...categories, newCategory]);
+          }
+        })
     }
     setIsFormOpen(false);
     setEditingCategory(null);
@@ -63,21 +77,19 @@ export default function CategoriesPage() {
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveTab('expense')}
-            className={`${
-              activeTab === 'expense'
-                ? 'border-green-500 text-green-600 dark:text-green-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            className={`${activeTab === 'expense'
+              ? 'border-green-500 text-green-600 dark:text-green-400'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
           >
             Expenses
           </button>
           <button
             onClick={() => setActiveTab('income')}
-            className={`${
-              activeTab === 'income'
-                ? 'border-green-500 text-green-600 dark:text-green-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            className={`${activeTab === 'income'
+              ? 'border-green-500 text-green-600 dark:text-green-400'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
           >
             Income
           </button>
