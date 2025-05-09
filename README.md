@@ -48,10 +48,10 @@ A personal finance manager built with Next.js that helps you track your income, 
 
 3. Run the development server:
    ```
-   npm run dev
-   # or
-   yarn dev
-   ```
+npm run dev
+# or
+yarn dev
+```
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 

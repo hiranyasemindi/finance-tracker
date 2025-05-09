@@ -7,6 +7,7 @@ import { mockBudgets, mockCategories } from '@/data/mockData';
 import { formatCurrency } from '@/types';
 import { PlusIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import BudgetForm from './BudgetForm';
+import { Select } from '@/components/form';
 
 export default function BudgetPage() {
   const [budgets, setBudgets] = useState(mockBudgets);
@@ -84,22 +85,25 @@ export default function BudgetPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center flex-wrap gap-4">
+      <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Budget Planning</h1>
         
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-4">
           {/* Month selector */}
-          <select
-            value={activeMonth}
-            onChange={(e) => setActiveMonth(e.target.value)}
-            className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          >
-            {getUniqueMonths().map((month) => (
-              <option key={month} value={month}>
-                {formatMonth(month)}
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center h-10">
+            <Select
+              id="month-selector"
+              name="month"
+              value={activeMonth}
+              onChange={(value) => setActiveMonth(value)}
+              options={getUniqueMonths().map((month) => ({
+                value: month,
+                label: formatMonth(month)
+              }))}
+              className="mb-0 w-52"
+              fullWidth={false}
+            />
+          </div>
           
           <Button
             onClick={() => {

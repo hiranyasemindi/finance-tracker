@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
+import { Input, Select, FormGroup } from '@/components/form';
 import { mockUser } from '@/data/mockData';
 import { UserIcon, MoonIcon, SunIcon, CogIcon } from '@heroicons/react/24/outline';
 
@@ -27,11 +28,17 @@ export default function ProfilePage() {
     { code: 'CNY', name: 'Chinese Yuan (¥)', symbol: '¥' },
   ];
 
+  // Currency options for select
+  const currencyOptions = currencies.map(currency => ({
+    value: currency.code,
+    label: currency.name
+  }));
+
   // Handle currency change
-  const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleCurrencyChange = (value: string) => {
     setUser(prev => ({
       ...prev,
-      preferredCurrency: e.target.value
+      preferredCurrency: value
     }));
   };
 
@@ -54,8 +61,7 @@ export default function ProfilePage() {
   };
 
   // Handle profile form change
-  const handleProfileFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+  const handleProfileFormChange = (name: string, value: string) => {
     setProfileForm(prev => ({
       ...prev,
       [name]: value
@@ -96,35 +102,27 @@ export default function ProfilePage() {
 
         {isEditingProfile ? (
           <form onSubmit={handleProfileFormSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Name
-              </label>
-              <input
+            <FormGroup>
+              <Input
                 type="text"
                 id="name"
                 name="name"
+                label="Name"
                 value={profileForm.name}
-                onChange={handleProfileFormChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                onChange={(e) => handleProfileFormChange('name', e.target.value)}
                 required
               />
-            </div>
-            
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Email
-              </label>
-              <input
+              
+              <Input
                 type="email"
                 id="email"
                 name="email"
+                label="Email"
                 value={profileForm.email}
-                onChange={handleProfileFormChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                onChange={(e) => handleProfileFormChange('email', e.target.value)}
                 required
               />
-            </div>
+            </FormGroup>
             
             <div className="flex justify-end space-x-3">
               <Button
@@ -172,25 +170,23 @@ export default function ProfilePage() {
         
         <div className="space-y-6">
           {/* Currency Preference */}
-          <div className="flex items-center justify-between">
-            <div>
+          <div className="flex items-center justify-between flex-wrap sm:flex-nowrap gap-4">
+            <div className="flex-grow">
               <h3 className="text-base font-medium text-gray-900 dark:text-white">Preferred Currency</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Choose the currency for displaying amounts
               </p>
             </div>
-            <div className="w-40">
-              <select
+            <div className="w-full sm:w-52">
+              <Select
+                id="currency"
+                name="currency"
                 value={user.preferredCurrency}
                 onChange={handleCurrencyChange}
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              >
-                {currencies.map(currency => (
-                  <option key={currency.code} value={currency.code}>
-                    {currency.name}
-                  </option>
-                ))}
-              </select>
+                options={currencyOptions}
+                fullWidth={true}
+                className="mb-0"
+              />
             </div>
           </div>
           

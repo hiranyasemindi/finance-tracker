@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Button from '@/components/Button';
+import { Input, Select, FormGroup } from '@/components/form';
 import { mockCategories } from '@/data/mockData';
 import { Budget } from '@/types';
 
@@ -31,9 +32,7 @@ export default function BudgetForm({
   // Get expense categories only (budgets are for expenses)
   const expenseCategories = mockCategories.filter(c => c.type === 'expense');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    
+  const handleChange = (name: string, value: any) => {
     // Handle numeric fields
     if (name === 'amount' || name === 'spent') {
       const numValue = parseFloat(value);
@@ -92,114 +91,81 @@ export default function BudgetForm({
     }
   };
 
+  // Prepare category options
+  const categoryOptions = [
+    { value: '', label: 'Select a category' },
+    ...expenseCategories.map(category => ({
+      value: category.id,
+      label: category.name
+    }))
+  ];
+
+  // Prepare month options
+  const monthOptions = getMonthOptions();
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-      {/* Category */}
-      <div>
-        <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Category
-        </label>
-        <select
+    <form onSubmit={handleSubmit} className="space-y-5 mt-4">
+      <FormGroup>
+        {/* Category */}
+        <Select
           id="categoryId"
           name="categoryId"
+          label="Category"
           value={formData.categoryId}
-          onChange={handleChange}
-          className={`mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
-            errors.categoryId ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''
-          }`}
-        >
-          <option value="">Select a category</option>
-          {expenseCategories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
-        {errors.categoryId && (
-          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.categoryId}</p>
-        )}
-      </div>
+          options={categoryOptions}
+          onChange={(value) => handleChange('categoryId', value)}
+          error={errors.categoryId}
+        />
 
-      {/* Month */}
-      <div>
-        <label htmlFor="month" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Month
-        </label>
-        <select
+        {/* Month */}
+        <Select
           id="month"
           name="month"
+          label="Month"
           value={formData.month}
-          onChange={handleChange}
-          className={`mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
-            errors.month ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''
-          }`}
-        >
-          {getMonthOptions().map(option => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        {errors.month && (
-          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.month}</p>
-        )}
-      </div>
+          options={monthOptions}
+          onChange={(value) => handleChange('month', value)}
+          error={errors.month}
+        />
 
-      {/* Budget Amount */}
-      <div>
-        <label htmlFor="amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Budget Amount
-        </label>
-        <div className="mt-1 relative rounded-md shadow-sm">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span className="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>
-          </div>
-          <input
+        {/* Budget Amount */}
+        <Input
+          id="amount"
+          name="amount"
+          type="number"
+          step="0.01"
+          min="0"
+          label="Budget Amount"
+          value={formData.amount}
+          onChange={(e) => handleChange('amount', e.target.value)}
+          error={errors.amount}
+          icon={<span className="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>}
+          placeholder="0.00"
+        />
+
+        {/* Spent Amount - Only show this for editing */}
+        {initialData && (
+          <Input
+            id="spent"
+            name="spent"
             type="number"
             step="0.01"
             min="0"
-            id="amount"
-            name="amount"
-            value={formData.amount}
-            onChange={handleChange}
-            className={`mt-1 block w-full pl-7 pr-3 py-2 sm:text-sm border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
-              errors.amount ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''
-            }`}
+            label="Amount Spent"
+            value={formData.spent}
+            onChange={(e) => handleChange('spent', e.target.value)}
+            icon={<span className="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>}
             placeholder="0.00"
+            className="mb-0"
           />
-        </div>
-        {errors.amount && (
-          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.amount}</p>
         )}
-      </div>
 
-      {/* Spent Amount - Only show this for editing */}
-      {initialData && (
-        <div>
-          <label htmlFor="spent" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Amount Spent
-          </label>
-          <div className="mt-1 relative rounded-md shadow-sm">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span className="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>
-            </div>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              id="spent"
-              name="spent"
-              value={formData.spent}
-              onChange={handleChange}
-              className="mt-1 block w-full pl-7 pr-3 py-2 sm:text-sm border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              placeholder="0.00"
-            />
-          </div>
+        {initialData && (
           <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
             This will be automatically updated based on your transactions, but you can manually adjust it if needed.
           </p>
-        </div>
-      )}
+        )}
+      </FormGroup>
 
       {/* Actions */}
       <div className="flex justify-end space-x-3 pt-4">

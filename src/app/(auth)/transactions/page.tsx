@@ -8,6 +8,7 @@ import { formatCurrency } from '@/types';
 import { mockTransactions, mockCategories } from '@/data/mockData';
 import { PlusIcon, FunnelIcon } from '@heroicons/react/24/outline';
 import TransactionForm from './TransactionForm';
+import { Input, Select, FormGroup } from '@/components/form';
 
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState(mockTransactions);
@@ -200,99 +201,70 @@ export default function TransactionsPage() {
       {/* Filters */}
       {isFilterOpen && (
         <Card>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <FormGroup grid cols={2} gap={4}>
             {/* Type Filter */}
-            <div>
-              <label htmlFor="type-filter" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Transaction Type
-              </label>
-              <select
-                id="type-filter"
-                value={filterType}
-                onChange={(e) => setFilterType(e.target.value)}
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              >
-                <option value="all">All Types</option>
-                <option value="income">Income</option>
-                <option value="expense">Expense</option>
-              </select>
-            </div>
+            <Select
+              id="type-filter"
+              label="Transaction Type"
+              value={filterType}
+              onChange={(value) => setFilterType(value)}
+              options={[
+                { value: 'all', label: 'All Types' },
+                { value: 'income', label: 'Income' },
+                { value: 'expense', label: 'Expense' }
+              ]}
+            />
 
             {/* Category Filter */}
-            <div>
-              <label htmlFor="category-filter" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Category
-              </label>
-              <select
-                id="category-filter"
-                value={filterCategory}
-                onChange={(e) => setFilterCategory(e.target.value)}
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              >
-                <option value="all">All Categories</option>
-                {mockCategories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <Select
+              id="category-filter"
+              label="Category"
+              value={filterCategory}
+              onChange={(value) => setFilterCategory(value)}
+              options={[
+                { value: 'all', label: 'All Categories' },
+                ...mockCategories.map((category) => ({
+                  value: category.id,
+                  label: category.name
+                }))
+              ]}
+            />
 
             {/* Date Range Filter */}
-            <div>
-              <label htmlFor="date-from" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Date From
-              </label>
-              <input
-                type="date"
-                id="date-from"
-                value={filterDateFrom}
-                onChange={(e) => setFilterDateFrom(e.target.value)}
-                className="mt-1 block w-full shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              />
-            </div>
+            <Input
+              type="date"
+              id="date-from"
+              label="Date From"
+              value={filterDateFrom}
+              onChange={(e) => setFilterDateFrom(e.target.value)}
+            />
 
-            <div>
-              <label htmlFor="date-to" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Date To
-              </label>
-              <input
-                type="date"
-                id="date-to"
-                value={filterDateTo}
-                onChange={(e) => setFilterDateTo(e.target.value)}
-                className="mt-1 block w-full shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              />
-            </div>
+            <Input
+              type="date"
+              id="date-to"
+              label="Date To"
+              value={filterDateTo}
+              onChange={(e) => setFilterDateTo(e.target.value)}
+            />
 
             {/* Amount Range Filter */}
-            <div>
-              <label htmlFor="amount-min" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Min Amount
-              </label>
-              <input
-                type="number"
-                id="amount-min"
-                value={filterAmount.min}
-                onChange={(e) => setFilterAmount({ ...filterAmount, min: e.target.value })}
-                className="mt-1 block w-full shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                placeholder="0"
-              />
-            </div>
+            <Input
+              type="number"
+              id="amount-min"
+              label="Min Amount"
+              value={filterAmount.min}
+              onChange={(e) => setFilterAmount({ ...filterAmount, min: e.target.value })}
+              placeholder="0"
+            />
 
-            <div>
-              <label htmlFor="amount-max" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Max Amount
-              </label>
-              <input
-                type="number"
-                id="amount-max"
-                value={filterAmount.max}
-                onChange={(e) => setFilterAmount({ ...filterAmount, max: e.target.value })}
-                className="mt-1 block w-full shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                placeholder="9999"
-              />
-            </div>
+            <Input
+              type="number"
+              id="amount-max"
+              label="Max Amount"
+              value={filterAmount.max}
+              onChange={(e) => setFilterAmount({ ...filterAmount, max: e.target.value })}
+              placeholder="9999"
+            />
 
             {/* Reset button spans 2 columns */}
             <div className="md:col-span-2 flex justify-end">
@@ -300,7 +272,7 @@ export default function TransactionsPage() {
                 Reset Filters
               </Button>
             </div>
-          </div>
+          </FormGroup>
         </Card>
       )}
 

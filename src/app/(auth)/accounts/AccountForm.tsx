@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Button from '@/components/Button';
+import { Input, Select, FormGroup } from '@/components/form';
 import { Account } from '@/types';
 
 interface AccountFormProps {
@@ -32,9 +33,7 @@ export default function AccountForm({
     { value: 'other', label: 'Other' },
   ];
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    
+  const handleChange = (name: string, value: any) => {
     if (name === 'balance') {
       const numValue = parseFloat(value);
       setFormData(prev => ({
@@ -77,82 +76,48 @@ export default function AccountForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-      {/* Account Name */}
-      <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Account Name
-        </label>
-        <input
-          type="text"
+    <form onSubmit={handleSubmit} className="space-y-5 mt-4">
+      <FormGroup>
+        {/* Account Name */}
+        <Input
           id="name"
           name="name"
+          type="text"
+          label="Account Name"
           value={formData.name}
-          onChange={handleChange}
-          className={`mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
-            errors.name ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''
-          }`}
+          onChange={(e) => handleChange('name', e.target.value)}
+          error={errors.name}
           placeholder="e.g., Checking Account, Cash Wallet"
         />
-        {errors.name && (
-          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name}</p>
-        )}
-      </div>
 
-      {/* Account Type */}
-      <div>
-        <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Account Type
-        </label>
-        <select
+        {/* Account Type */}
+        <Select
           id="type"
           name="type"
+          label="Account Type"
           value={formData.type}
-          onChange={handleChange}
-          className={`mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
-            errors.type ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''
-          }`}
-        >
-          {accountTypes.map(type => (
-            <option key={type.value} value={type.value}>
-              {type.label}
-            </option>
-          ))}
-        </select>
-        {errors.type && (
-          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.type}</p>
-        )}
-      </div>
+          options={accountTypes}
+          onChange={(value) => handleChange('type', value)}
+          error={errors.type}
+        />
 
-      {/* Balance */}
-      <div>
-        <label htmlFor="balance" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Current Balance
-        </label>
-        <div className="mt-1 relative rounded-md shadow-sm">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span className="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>
-          </div>
-          <input
-            type="number"
-            step="0.01"
-            id="balance"
-            name="balance"
-            value={formData.balance === undefined ? '' : formData.balance}
-            onChange={handleChange}
-            className={`mt-1 block w-full pl-7 pr-3 py-2 sm:text-sm border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
-              errors.balance ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''
-            }`}
-            placeholder="0.00"
-          />
-        </div>
-        {errors.balance && (
-          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.balance}</p>
-        )}
+        {/* Balance */}
+        <Input
+          id="balance"
+          name="balance"
+          type="number"
+          step="0.01"
+          label="Current Balance"
+          value={formData.balance === undefined ? '' : formData.balance}
+          onChange={(e) => handleChange('balance', e.target.value)}
+          error={errors.balance}
+          icon={<span className="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>}
+          placeholder="0.00"
+        />
         <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
           For credit cards, enter a negative balance if you owe money.
         </p>
-      </div>
+      </FormGroup>
 
       {/* Form Actions */}
       <div className="flex justify-end space-x-3 pt-4">

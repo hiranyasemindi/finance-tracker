@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
+import { Select } from '@/components/form';
 import ChartComponent from '@/components/ChartComponent';
 import { mockMonthlyReports, mockCategories, generateMonthlyData, generateCategoryBreakdown } from '@/data/mockData';
 import { formatCurrency } from '@/types';
@@ -21,6 +22,12 @@ export default function ReportsPage() {
     const date = new Date(parseInt(year), parseInt(month) - 1);
     return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   };
+
+  // Prepare month options for select
+  const monthOptions = mockMonthlyReports.map(report => ({
+    value: report.month,
+    label: formatMonthDisplay(report.month)
+  }));
 
   // Monthly data for charts
   const monthlyData = generateMonthlyData();
@@ -106,25 +113,25 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center flex-wrap gap-4">
+      <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Financial Reports</h1>
         
         <div className="flex items-center space-x-4">
           {/* Month selector */}
-          <select
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          >
-            {mockMonthlyReports.map((report) => (
-              <option key={report.month} value={report.month}>
-                {formatMonthDisplay(report.month)}
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center">
+            <Select
+              id="month-selector"
+              name="month"
+              value={selectedMonth}
+              onChange={(value) => setSelectedMonth(value)}
+              options={monthOptions}
+              className="mb-0 w-52"
+              fullWidth={false}
+            />
+          </div>
 
           {/* Download buttons */}
-          <div className="flex space-x-2">
+          <div className="flex items-center space-x-2">
             <Button
               variant="secondary"
               size="sm"
