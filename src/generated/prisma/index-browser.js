@@ -120,9 +120,29 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.CategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  color: 'color',
+  type: 'type'
+};
+
+exports.Prisma.SortOrder = {
+  asc: 'asc',
+  desc: 'desc'
+};
+
+exports.Prisma.QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+};
+exports.TransactionType = exports.$Enums.TransactionType = {
+  income: 'income',
+  expense: 'expense'
+};
 
 exports.Prisma.ModelName = {
-
+  Category: 'Category'
 };
 
 /**

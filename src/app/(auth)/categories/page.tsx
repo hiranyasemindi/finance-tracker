@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
 import { mockCategories } from '@/data/mockData';
@@ -9,10 +9,32 @@ import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import CategoryForm from './CategoryForm';
 
 export default function CategoriesPage() {
-  const [categories, setCategories] = useState(mockCategories);
+  const [categories, setCategories] = useState([]);
   const [activeTab, setActiveTab] = useState<TransactionType>('expense');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+
+  const fetchCategories = async () => {
+    await fetch('/api/categories', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          console.error('Error fetching categories:', data.error);
+        } else {
+          setCategories(data);
+        }
+      }
+      )
+  }
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   // Filter categories by type
   const filteredCategories = categories.filter(category => category.type === activeTab);
@@ -41,7 +63,6 @@ export default function CategoriesPage() {
           } else {
             const newCategory = {
               ...category,
-              id: `cat-${Date.now()}`,
             } as Category;
             setCategories([...categories, newCategory]);
           }
