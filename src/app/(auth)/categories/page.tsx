@@ -3,16 +3,19 @@
 import { useEffect, useState } from 'react';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
-import { mockCategories } from '@/data/mockData';
 import { Category, TransactionType } from '@/types';
+import { showToast } from 'nextjs-toast-notify';
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import CategoryForm from './CategoryForm';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState([]);
   const [activeTab, setActiveTab] = useState<TransactionType>('expense');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const fetchCategories = async () => {
     await fetch('/api/categories', {
@@ -24,12 +27,35 @@ export default function CategoriesPage() {
       .then(res => res.json())
       .then(data => {
         if (data.error) {
+          showToast.error(`Error fetching categories`, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
           console.error('Error fetching categories:', data.error);
         } else {
           setCategories(data);
+          setLoading(false);
         }
       }
       )
+      .catch(error => {
+        showToast.error(`Error fetching categories`, {
+          duration: 3000,
+          progress: true,
+          position: "top-right",
+          transition: "bounceIn",
+          icon: '',
+          sound: true,
+        });
+        console.error('Error fetching categories:', error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }
 
   useEffect(() => {
@@ -43,10 +69,41 @@ export default function CategoriesPage() {
   const handleAddCategory = async (category: Partial<Category>) => {
     if (editingCategory) {
       // Update existing category
-      const updatedCategories = categories.map(c =>
-        c.id === editingCategory.id ? { ...category, id: editingCategory.id } as Category : c
-      );
-      setCategories(updatedCategories);
+      await fetch('/api/categories/edit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...category, id: editingCategory.id }),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            showToast.error(`Error updating categories`, {
+              duration: 3000,
+              progress: true,
+              position: "top-right",
+              transition: "bounceIn",
+              icon: '',
+              sound: true,
+            });
+            console.error('Error updating category:', data.error);
+          } else {
+            const updatedCategories = categories.map(c =>
+              c.id === editingCategory.id ? { ...category, id: editingCategory.id } as Category : c
+            );
+            setCategories(updatedCategories);
+            showToast.success(`Category updated successfully`, {
+              duration: 3000,
+              progress: true,
+              position: "top-right",
+              transition: "bounceIn",
+              icon: '',
+              sound: true,
+            });
+          }
+
+        });
     } else {
       // Add new category with generated ID
       await fetch('/api/categories/add', {
@@ -59,12 +116,28 @@ export default function CategoriesPage() {
         .then(res => res.json())
         .then(data => {
           if (data.error) {
+            showToast.error(`Error adding categories`, {
+              duration: 3000,
+              progress: true,
+              position: "top-right",
+              transition: "bounceIn",
+              icon: '',
+              sound: true,
+            });
             console.error('Error adding category:', data.error);
           } else {
             const newCategory = {
               ...category,
             } as Category;
             setCategories([...categories, newCategory]);
+            showToast.success(`Category added successfully`, {
+              duration: 3000,
+              progress: true,
+              position: "top-right",
+              transition: "bounceIn",
+              icon: '',
+              sound: true,
+            });
           }
         })
     }
@@ -73,8 +146,38 @@ export default function CategoriesPage() {
   };
 
   // Handle delete category
-  const handleDeleteCategory = (id: string) => {
-    setCategories(categories.filter(c => c.id !== id));
+  const handleDeleteCategory = async (id: string) => {
+    await fetch('/api/categories/delete', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          showToast.error(`Error deleting categories`, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+          console.error('Error deleting category:', data.error);
+        } else {
+          showToast.success(`Category deleted successfully`, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+          setCategories(categories.filter(c => c.id !== id));
+        }
+      });
   };
 
   return (
@@ -119,6 +222,16 @@ export default function CategoriesPage() {
 
       {/* Categories Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {loading && (
+          Array(6).fill(0).map((_, i) => (
+            <div key={i} className="p-4 border bg-white rounded shadow">
+              <Skeleton height={32} width={32} circle />
+              <Skeleton height={20} width="60%" />
+              <Skeleton height={16} width="80%" />
+            </div>
+          ))
+        )}
+
         {filteredCategories.map(category => (
           <Card key={category.id} className="flex flex-col">
             <div className="flex items-center mb-4">
@@ -154,7 +267,7 @@ export default function CategoriesPage() {
         ))}
 
         {/* Empty state */}
-        {filteredCategories.length === 0 && (
+        {!loading && filteredCategories.length === 0 && (
           <Card className="col-span-full py-12">
             <div className="text-center">
               <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-white">
