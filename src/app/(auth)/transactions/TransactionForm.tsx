@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react';
 import Button from '@/components/Button';
 import { Input, Select, TextArea, FormGroup } from '@/components/form';
 import { mockCategories, mockAccounts } from '@/data/mockData';
-import { Transaction } from '@/types';
+import { Category, Transaction } from '@/types';
+import { showToast } from 'nextjs-toast-notify';
 
 interface TransactionFormProps {
   onSubmit: (data: Partial<Transaction>) => void;
@@ -28,18 +29,44 @@ export default function TransactionForm({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [availableCategories, setAvailableCategories] = useState(mockCategories);
+  const [availableCategories, setAvailableCategories] = useState([]);
 
-  // Filter categories based on transaction type
-  useEffect(() => {
-    setAvailableCategories(mockCategories.filter(c => c.type === formData.type));
-    // Reset category if it doesn't match the current type
-    if (formData.categoryId) {
-      const category = mockCategories.find(c => c.id === formData.categoryId);
-      if (category && category.type !== formData.type) {
-        setFormData(prev => ({ ...prev, categoryId: '' }));
+  const fetchAndFilterCategories = () => {
+    fetch('/api/categories', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
       }
-    }
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          showToast.error(`Error fetching categories`, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+          console.error('Error fetching categories:', data.error);
+          return;
+        }
+        setAvailableCategories(data.filter((category: Category) => category.type === formData.type));
+        if (formData.categoryId) {
+          const category = data.find(c => c.id === formData.categoryId);
+          if (category && category.type !== formData.type) {
+            setFormData(prev => ({ ...prev, categoryId: '' }));
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching categories:', error);
+      });
+  }
+
+  useEffect(() => {
+    fetchAndFilterCategories();
   }, [formData.type]);
 
   const handleChange = (name: string, value: any) => {
@@ -74,7 +101,7 @@ export default function TransactionForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (validateForm()) {
       onSubmit(formData);
     }
