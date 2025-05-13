@@ -1,60 +1,99 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import Card from '@/components/Card';
-import Button from '@/components/Button';
-import DataTable from '@/components/DataTable';
-import { formatCurrency } from '@/types';
-import { mockTransactions, mockCategories } from '@/data/mockData';
-import { PlusIcon, FunnelIcon } from '@heroicons/react/24/outline';
-import TransactionForm from './TransactionForm';
-import { Input, Select, FormGroup } from '@/components/form';
+import React, { useState, useEffect } from "react";
+import Card from "@/components/Card";
+import Button from "@/components/Button";
+import DataTable from "@/components/DataTable";
+import { formatCurrency } from "@/types";
+import { mockTransactions } from "@/data/mockData";
+import { PlusIcon, FunnelIcon } from "@heroicons/react/24/outline";
+import TransactionForm from "./TransactionForm";
+import { Input, Select, FormGroup } from "@/components/form";
+import { showToast } from "nextjs-toast-notify";
 
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState(mockTransactions);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<any>(null);
-  
+
   // Filter states
-  const [filterType, setFilterType] = useState<string>('all');
-  const [filterCategory, setFilterCategory] = useState<string>('all');
-  const [filterDateFrom, setFilterDateFrom] = useState<string>('');
-  const [filterDateTo, setFilterDateTo] = useState<string>('');
-  const [filterAmount, setFilterAmount] = useState<{ min: string, max: string }>({ min: '', max: '' });
+  const [filterType, setFilterType] = useState<string>("all");
+  const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [filterDateFrom, setFilterDateFrom] = useState<string>("");
+  const [filterDateTo, setFilterDateTo] = useState<string>("");
+  const [filterAmount, setFilterAmount] = useState<{
+    min: string;
+    max: string;
+  }>({ min: "", max: "" });
+
+  useEffect(() => {
+    fetch("/api/categories")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Categories:", data);
+        if (data.error) {
+          console.error(data.error);
+          showToast.error(`Error fetching categories`, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: "",
+            sound: true,
+          });
+          return;
+        }
+        setCategories(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching categories:", error);
+      });
+  }, []);
 
   // Apply filters
   useEffect(() => {
-    let filteredData = [...mockTransactions];
-    
+    let filteredData = [...categories];
+
     // Filter by transaction type
-    if (filterType !== 'all') {
-      filteredData = filteredData.filter(t => t.type === filterType);
+    if (filterType !== "all") {
+      filteredData = filteredData.filter((t) => t.type === filterType);
     }
-    
+
     // Filter by category
-    if (filterCategory !== 'all') {
-      filteredData = filteredData.filter(t => t.categoryId === filterCategory);
+    if (filterCategory !== "all") {
+      filteredData = filteredData.filter(
+        (t) => t.categoryId === filterCategory
+      );
     }
-    
+
     // Filter by date range
     if (filterDateFrom) {
-      filteredData = filteredData.filter(t => new Date(t.date) >= new Date(filterDateFrom));
+      filteredData = filteredData.filter(
+        (t) => new Date(t.date) >= new Date(filterDateFrom)
+      );
     }
-    
+
     if (filterDateTo) {
-      filteredData = filteredData.filter(t => new Date(t.date) <= new Date(filterDateTo));
+      filteredData = filteredData.filter(
+        (t) => new Date(t.date) <= new Date(filterDateTo)
+      );
     }
-    
+
     // Filter by amount range
     if (filterAmount.min) {
-      filteredData = filteredData.filter(t => t.amount >= Number(filterAmount.min));
+      filteredData = filteredData.filter(
+        (t) => t.amount >= Number(filterAmount.min)
+      );
     }
-    
+
     if (filterAmount.max) {
-      filteredData = filteredData.filter(t => t.amount <= Number(filterAmount.max));
+      filteredData = filteredData.filter(
+        (t) => t.amount <= Number(filterAmount.max)
+      );
     }
-    
+
     setTransactions(filteredData);
   }, [filterType, filterCategory, filterDateFrom, filterDateTo, filterAmount]);
 
@@ -62,8 +101,10 @@ export default function TransactionsPage() {
   const handleAddTransaction = (transaction: any) => {
     if (editingTransaction) {
       // Update existing transaction
-      const updatedTransactions = transactions.map(t => 
-        t.id === editingTransaction.id ? { ...transaction, id: editingTransaction.id } : t
+      const updatedTransactions = transactions.map((t) =>
+        t.id === editingTransaction.id
+          ? { ...transaction, id: editingTransaction.id }
+          : t
       );
       setTransactions(updatedTransactions);
       setEditingTransaction(null);
@@ -86,70 +127,77 @@ export default function TransactionsPage() {
 
   // Handle delete transaction
   const handleDeleteTransaction = (id: string) => {
-    setTransactions(transactions.filter(t => t.id !== id));
+    setTransactions(transactions.filter((t) => t.id !== id));
   };
 
   // Reset filters
   const resetFilters = () => {
-    setFilterType('all');
-    setFilterCategory('all');
-    setFilterDateFrom('');
-    setFilterDateTo('');
-    setFilterAmount({ min: '', max: '' });
+    setFilterType("all");
+    setFilterCategory("all");
+    setFilterDateFrom("");
+    setFilterDateTo("");
+    setFilterAmount({ min: "", max: "" });
   };
 
   // Get category name by ID
   const getCategoryName = (categoryId: string) => {
-    const category = mockCategories.find(c => c.id === categoryId);
-    return category ? category.name : 'Unknown';
+    const category = categories.find((c) => c.id === categoryId);
+    return category ? category.name : "Unknown";
   };
 
   // DataTable columns
   const columns = [
     {
-      key: 'date',
-      header: 'Date',
+      key: "date",
+      header: "Date",
       sortable: true,
-      render: (transaction: any) => new Date(transaction.date).toLocaleDateString(),
+      render: (transaction: any) =>
+        new Date(transaction.date).toLocaleDateString(),
     },
     {
-      key: 'categoryId',
-      header: 'Category',
+      key: "categoryId",
+      header: "Category",
       sortable: true,
       render: (transaction: any) => getCategoryName(transaction.categoryId),
     },
     {
-      key: 'amount',
-      header: 'Amount',
+      key: "amount",
+      header: "Amount",
       sortable: true,
       render: (transaction: any) => (
-        <span className={transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}>
+        <span
+          className={
+            transaction.type === "income" ? "text-green-600" : "text-red-600"
+          }
+        >
           {formatCurrency(transaction.amount)}
         </span>
       ),
     },
     {
-      key: 'type',
-      header: 'Type',
+      key: "type",
+      header: "Type",
       sortable: true,
       render: (transaction: any) => (
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-          transaction.type === 'income' 
-            ? 'bg-green-100 text-green-800' 
-            : 'bg-red-100 text-red-800'
-        }`}>
-          {transaction.type === 'income' ? 'Income' : 'Expense'}
+        <span
+          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+            transaction.type === "income"
+              ? "bg-green-100 text-green-800"
+              : "bg-red-100 text-red-800"
+          }`}
+        >
+          {transaction.type === "income" ? "Income" : "Expense"}
         </span>
       ),
     },
     {
-      key: 'notes',
-      header: 'Notes',
+      key: "notes",
+      header: "Notes",
       sortable: false,
     },
     {
-      key: 'actions',
-      header: 'Actions',
+      key: "actions",
+      header: "Actions",
       sortable: false,
       render: (transaction: any) => (
         <div className="flex space-x-2">
@@ -175,7 +223,9 @@ export default function TransactionsPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Transactions</h1>
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
+          Transactions
+        </h1>
         <div className="flex space-x-3">
           <Button
             onClick={() => setIsFilterOpen(!isFilterOpen)}
@@ -209,9 +259,9 @@ export default function TransactionsPage() {
               value={filterType}
               onChange={(value) => setFilterType(value)}
               options={[
-                { value: 'all', label: 'All Types' },
-                { value: 'income', label: 'Income' },
-                { value: 'expense', label: 'Expense' }
+                { value: "all", label: "All Types" },
+                { value: "income", label: "Income" },
+                { value: "expense", label: "Expense" },
               ]}
             />
 
@@ -222,11 +272,11 @@ export default function TransactionsPage() {
               value={filterCategory}
               onChange={(value) => setFilterCategory(value)}
               options={[
-                { value: 'all', label: 'All Categories' },
-                ...mockCategories.map((category) => ({
+                { value: "all", label: "All Categories" },
+                ...categories.map((category) => ({
                   value: category.id,
-                  label: category.name
-                }))
+                  label: category.name,
+                })),
               ]}
             />
 
@@ -253,7 +303,9 @@ export default function TransactionsPage() {
               id="amount-min"
               label="Min Amount"
               value={filterAmount.min}
-              onChange={(e) => setFilterAmount({ ...filterAmount, min: e.target.value })}
+              onChange={(e) =>
+                setFilterAmount({ ...filterAmount, min: e.target.value })
+              }
               placeholder="0"
             />
 
@@ -262,7 +314,9 @@ export default function TransactionsPage() {
               id="amount-max"
               label="Max Amount"
               value={filterAmount.max}
-              onChange={(e) => setFilterAmount({ ...filterAmount, max: e.target.value })}
+              onChange={(e) =>
+                setFilterAmount({ ...filterAmount, max: e.target.value })
+              }
               placeholder="9999"
             />
 
@@ -292,7 +346,9 @@ export default function TransactionsPage() {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full">
             <div className="p-6">
               <h2 className="text-lg font-medium text-gray-900 dark:text-white">
-                {editingTransaction ? 'Edit Transaction' : 'Add New Transaction'}
+                {editingTransaction
+                  ? "Edit Transaction"
+                  : "Add New Transaction"}
               </h2>
               <TransactionForm
                 onSubmit={handleAddTransaction}
@@ -308,4 +364,4 @@ export default function TransactionsPage() {
       )}
     </div>
   );
-} 
+}
