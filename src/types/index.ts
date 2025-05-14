@@ -1,4 +1,5 @@
 export type TransactionType = 'income' | 'expense';
+export type AccountType = 'bank' | 'cash' | 'credit' | 'investment' | 'other';
 
 export interface Transaction {
   id: string;
@@ -21,7 +22,7 @@ export interface Account {
   id: string;
   name: string;
   balance: number;
-  type: 'bank' | 'cash' | 'credit' | 'investment' | 'other';
+  type: AccountType;
 }
 
 export interface Budget {

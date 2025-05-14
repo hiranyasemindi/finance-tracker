@@ -19,9 +19,24 @@ enum TransactionType {
   expense
 }
 
+enum AccountType {
+  bank
+  cash
+  credit
+  investment
+  other
+}
+
 model Category {
   id    Int             @id @default(autoincrement())
   name  String          @unique
   color String
   type  TransactionType
+}
+
+model Account {
+  id      Int         @id @default(autoincrement())
+  name    String      @unique
+  type    AccountType
+  balance Float       @default(0)
 }

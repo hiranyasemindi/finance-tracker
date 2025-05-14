@@ -126,10 +126,7 @@ export default function CategoriesPage() {
             });
             console.error('Error adding category:', data.error);
           } else {
-            const newCategory = {
-              ...category,
-            } as Category;
-            setCategories([...categories, newCategory]);
+            setCategories([...categories, data]);
             showToast.success(`Category added successfully`, {
               duration: 3000,
               progress: true,

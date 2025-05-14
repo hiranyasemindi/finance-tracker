@@ -15,7 +15,7 @@ export default function AccountsPage() {
 
   // Calculate total balance
   const totalBalance = accounts.reduce((sum, account) => sum + account.balance, 0);
-  
+
   // Group accounts by type
   const accountsByType = accounts.reduce((acc: Record<string, any[]>, account) => {
     if (!acc[account.type]) {
@@ -29,17 +29,27 @@ export default function AccountsPage() {
   const handleAddAccount = (account: any) => {
     if (editingAccount) {
       // Update existing account
-      const updatedAccounts = accounts.map(a => 
+      const updatedAccounts = accounts.map(a =>
         a.id === editingAccount.id ? { ...account, id: editingAccount.id } : a
       );
       setAccounts(updatedAccounts);
     } else {
       // Add new account with generated ID
-      const newAccount = {
-        ...account,
-        id: `acc-${Date.now()}`,
-      };
-      setAccounts([...accounts, newAccount]);
+      fetch('/api/accounts/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(account),
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            console.error('Error adding account:', data.error);
+          } else {
+            setAccounts([...accounts, data]);
+          }
+        })
     }
     setIsFormOpen(false);
     setEditingAccount(null);
@@ -153,9 +163,8 @@ export default function AccountsPage() {
                       </div>
                       <div>
                         <h3 className="font-medium text-gray-900 dark:text-white">{account.name}</h3>
-                        <p className={`text-lg font-bold ${
-                          account.balance < 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'
-                        }`}>
+                        <p className={`text-lg font-bold ${account.balance < 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'
+                          }`}>
                           {formatCurrency(account.balance)}
                         </p>
                       </div>

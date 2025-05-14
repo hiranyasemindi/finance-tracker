@@ -127,6 +127,13 @@ exports.Prisma.CategoryScalarFieldEnum = {
   type: 'type'
 };
 
+exports.Prisma.AccountScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  type: 'type',
+  balance: 'balance'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -141,8 +148,17 @@ exports.TransactionType = exports.$Enums.TransactionType = {
   expense: 'expense'
 };
 
+exports.AccountType = exports.$Enums.AccountType = {
+  bank: 'bank',
+  cash: 'cash',
+  credit: 'credit',
+  investment: 'investment',
+  other: 'other'
+};
+
 exports.Prisma.ModelName = {
-  Category: 'Category'
+  Category: 'Category',
+  Account: 'Account'
 };
 
 /**
