@@ -22,15 +22,68 @@ import {
   ChevronDownIcon
 } from '@heroicons/react/24/outline';
 
+// Create fixed transactions for initial render to avoid hydration mismatch
+const initialTransactions = [
+  {
+    id: 'trans-1',
+    amount: 2500,
+    type: 'income',
+    date: '2023-05-15',
+    categoryId: '1', // Salary
+    accountId: '1',
+    notes: 'Monthly salary'
+  },
+  {
+    id: 'trans-2',
+    amount: 1200,
+    type: 'expense',
+    date: '2023-05-16',
+    categoryId: '5', // Rent
+    accountId: '1',
+    notes: 'Monthly rent'
+  },
+  {
+    id: 'trans-3',
+    amount: 85,
+    type: 'expense',
+    date: '2023-05-18',
+    categoryId: '3', // Food
+    accountId: '1',
+    notes: 'Grocery shopping'
+  },
+  {
+    id: 'trans-4',
+    amount: 45,
+    type: 'expense',
+    date: '2023-05-20',
+    categoryId: '4', // Transport
+    accountId: '1',
+    notes: 'Gas'
+  },
+  {
+    id: 'trans-5',
+    amount: 120,
+    type: 'expense',
+    date: '2023-05-22',
+    categoryId: '6', // Entertainment
+    accountId: '1',
+    notes: 'Concert tickets'
+  }
+];
+
 export default function Dashboard() {
   const [totalBalance, setTotalBalance] = useState(0);
   const [monthlyIncome, setMonthlyIncome] = useState(0);
   const [monthlyExpense, setMonthlyExpense] = useState(0);
-  const [recentTransactions, setRecentTransactions] = useState(mockTransactions.slice(0, 5));
+  const [recentTransactions, setRecentTransactions] = useState(initialTransactions);
   const [dateRange, setDateRange] = useState('last30');
   const [isDateDropdownOpen, setIsDateDropdownOpen] = useState(false);
+  const [isClientSide, setIsClientSide] = useState(false);
   
   useEffect(() => {
+    // Mark that we're on the client side
+    setIsClientSide(true);
+    
     // Calculate total balance
     const balance = mockAccounts.reduce((total, account) => total + account.balance, 0);
     setTotalBalance(balance);
@@ -39,6 +92,9 @@ export default function Dashboard() {
   }, [dateRange]);
   
   const updateTransactionData = (range: string) => {
+    // Only update with dynamic data on the client side
+    if (!isClientSide) return;
+    
     const currentDate = new Date();
     let startDate = new Date();
     let filterLabel = 'Last 30 Days';
@@ -151,6 +207,16 @@ export default function Dashboard() {
       case 'thisYear': return 'This Year';
       default: return 'Last 30 Days';
     }
+  };
+  
+  // Format date consistently for both server and client
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric'
+    });
   };
 
   return (
@@ -319,7 +385,7 @@ export default function Dashboard() {
               {recentTransactions.map((transaction) => (
                 <tr key={transaction.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                    {new Date(transaction.date).toLocaleDateString()}
+                    {formatDate(transaction.date)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
                     {getCategoryName(transaction.categoryId)}
