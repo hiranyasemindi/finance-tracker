@@ -40,7 +40,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
               error
                 ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                 : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
-            } rounded-md shadow-sm focus:outline-none sm:text-sm text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${className}`}
+            } rounded-md shadow-sm focus:outline-none sm:text-sm text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-white appearance-none ${className}`}
             onChange={handleChange}
             {...props}
           >
