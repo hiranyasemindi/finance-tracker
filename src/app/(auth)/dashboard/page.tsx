@@ -71,24 +71,105 @@ const initialTransactions = [
   }
 ];
 
+// Fixed financial data for initial render
+const initialFinancialData = {
+  totalBalance: 17959.92, // Sum of all account balances
+  monthlyIncome: 2500.00,
+  monthlyExpense: 1450.00
+};
+
+// Fixed chart data for initial render
+const initialBarChartData = {
+  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  datasets: [
+    {
+      label: 'Income',
+      data: [2200, 2400, 2300, 2500, 2600, 2400, 2500, 2700, 2800, 2600, 2500, 2700],
+      backgroundColor: 'rgba(52, 211, 153, 0.8)',
+    },
+    {
+      label: 'Expenses',
+      data: [1400, 1300, 1500, 1450, 1600, 1400, 1550, 1500, 1600, 1450, 1400, 1650],
+      backgroundColor: 'rgba(248, 113, 113, 0.8)',
+    },
+  ],
+};
+
+// Fixed pie chart data for initial render
+const initialPieChartData = {
+  labels: ['Food', 'Transport', 'Rent', 'Entertainment', 'Shopping', 'Utilities'],
+  datasets: [
+    {
+      data: [300, 150, 1200, 200, 250, 180],
+      backgroundColor: [
+        '#F87171', // Food
+        '#FBBF24', // Transport
+        '#A78BFA', // Rent
+        '#EC4899', // Entertainment
+        '#F97316', // Shopping
+        '#8B5CF6', // Utilities
+      ],
+      borderWidth: 1,
+    },
+  ],
+};
+
 export default function Dashboard() {
-  const [totalBalance, setTotalBalance] = useState(0);
-  const [monthlyIncome, setMonthlyIncome] = useState(0);
-  const [monthlyExpense, setMonthlyExpense] = useState(0);
+  const [totalBalance, setTotalBalance] = useState(initialFinancialData.totalBalance);
+  const [monthlyIncome, setMonthlyIncome] = useState(initialFinancialData.monthlyIncome);
+  const [monthlyExpense, setMonthlyExpense] = useState(initialFinancialData.monthlyExpense);
   const [recentTransactions, setRecentTransactions] = useState(initialTransactions);
   const [dateRange, setDateRange] = useState('last30');
   const [isDateDropdownOpen, setIsDateDropdownOpen] = useState(false);
   const [isClientSide, setIsClientSide] = useState(false);
+  const [barChartData, setBarChartData] = useState(initialBarChartData);
+  const [pieChartData, setPieChartData] = useState(initialPieChartData);
   
   useEffect(() => {
     // Mark that we're on the client side
     setIsClientSide(true);
     
-    // Calculate total balance
-    const balance = mockAccounts.reduce((total, account) => total + account.balance, 0);
-    setTotalBalance(balance);
-    
-    updateTransactionData(dateRange);
+    // Only update with dynamic data on the client side after hydration
+    if (typeof window !== 'undefined') {
+      // Calculate total balance
+      const balance = mockAccounts.reduce((total, account) => total + account.balance, 0);
+      setTotalBalance(balance);
+      
+      // Generate dynamic chart data
+      const monthlyData = generateMonthlyData();
+      const expenseBreakdown = generateCategoryBreakdown('expense');
+      
+      // Update chart data
+      setBarChartData({
+        labels: monthlyData.labels,
+        datasets: [
+          {
+            label: 'Income',
+            data: monthlyData.incomeData,
+            backgroundColor: 'rgba(52, 211, 153, 0.8)',
+          },
+          {
+            label: 'Expenses',
+            data: monthlyData.expenseData,
+            backgroundColor: 'rgba(248, 113, 113, 0.8)',
+          },
+        ],
+      });
+      
+      setPieChartData({
+        labels: expenseBreakdown.labels,
+        datasets: [
+          {
+            data: expenseBreakdown.data,
+            backgroundColor: expenseBreakdown.backgroundColor,
+            borderWidth: 1,
+          },
+        ],
+      });
+      
+      // Update transactions data
+      updateTransactionData(dateRange);
+    }
   }, [dateRange]);
   
   const updateTransactionData = (range: string) => {
@@ -157,39 +238,6 @@ export default function Dashboard() {
     setIsDateDropdownOpen(false);
   };
   
-  // Generate chart data
-  const monthlyData = generateMonthlyData();
-  const expenseBreakdown = generateCategoryBreakdown('expense');
-  
-  // Monthly chart data
-  const barChartData = {
-    labels: monthlyData.labels,
-    datasets: [
-      {
-        label: 'Income',
-        data: monthlyData.incomeData,
-        backgroundColor: 'rgba(52, 211, 153, 0.8)',
-      },
-      {
-        label: 'Expenses',
-        data: monthlyData.expenseData,
-        backgroundColor: 'rgba(248, 113, 113, 0.8)',
-      },
-    ],
-  };
-  
-  // Expense breakdown pie chart
-  const pieChartData = {
-    labels: expenseBreakdown.labels,
-    datasets: [
-      {
-        data: expenseBreakdown.data,
-        backgroundColor: expenseBreakdown.backgroundColor,
-        borderWidth: 1,
-      },
-    ],
-  };
-
   // Get category name by ID
   const getCategoryName = (categoryId: string) => {
     const category = mockCategories.find(c => c.id === categoryId);

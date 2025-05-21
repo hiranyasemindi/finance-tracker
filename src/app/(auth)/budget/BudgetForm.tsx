@@ -95,7 +95,7 @@ export default function BudgetForm({
   const categoryOptions = [
     { value: '', label: 'Select a category' },
     ...expenseCategories.map(category => ({
-      value: category.id,
+      value: String(category.id),
       label: category.name
     }))
   ];

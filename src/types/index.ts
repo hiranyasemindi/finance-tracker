@@ -12,7 +12,7 @@ export interface Transaction {
 }
 
 export interface Category {
-  id: number;
+  id: string;
   name: string;
   type: TransactionType;
   color: string;
