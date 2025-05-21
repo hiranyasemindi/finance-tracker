@@ -134,6 +134,17 @@ exports.Prisma.AccountScalarFieldEnum = {
   balance: 'balance'
 };
 
+exports.Prisma.UserScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  password: 'password',
+  preferredCurrency: 'preferredCurrency',
+  isDarkMode: 'isDarkMode',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -158,7 +169,8 @@ exports.AccountType = exports.$Enums.AccountType = {
 
 exports.Prisma.ModelName = {
   Category: 'Category',
-  Account: 'Account'
+  Account: 'Account',
+  User: 'User'
 };
 
 /**
