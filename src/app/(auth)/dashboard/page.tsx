@@ -18,7 +18,8 @@ import {
   CreditCardIcon,
   WalletIcon,
   ChartBarIcon,
-  CalendarIcon
+  CalendarIcon,
+  ChevronDownIcon
 } from '@heroicons/react/24/outline';
 
 export default function Dashboard() {
@@ -26,36 +27,79 @@ export default function Dashboard() {
   const [monthlyIncome, setMonthlyIncome] = useState(0);
   const [monthlyExpense, setMonthlyExpense] = useState(0);
   const [recentTransactions, setRecentTransactions] = useState(mockTransactions.slice(0, 5));
+  const [dateRange, setDateRange] = useState('last30');
+  const [isDateDropdownOpen, setIsDateDropdownOpen] = useState(false);
   
   useEffect(() => {
     // Calculate total balance
     const balance = mockAccounts.reduce((total, account) => total + account.balance, 0);
     setTotalBalance(balance);
     
-    // Calculate monthly income and expense
+    updateTransactionData(dateRange);
+  }, [dateRange]);
+  
+  const updateTransactionData = (range: string) => {
     const currentDate = new Date();
-    const currentMonth = currentDate.getMonth();
-    const currentYear = currentDate.getFullYear();
+    let startDate = new Date();
+    let filterLabel = 'Last 30 Days';
     
-    // Filter transactions for current month
-    const thisMonthTransactions = mockTransactions.filter(transaction => {
+    // Set the start date based on the selected range
+    switch(range) {
+      case 'last7':
+        startDate.setDate(currentDate.getDate() - 7);
+        filterLabel = 'Last 7 Days';
+        break;
+      case 'last30':
+        startDate.setDate(currentDate.getDate() - 30);
+        filterLabel = 'Last 30 Days';
+        break;
+      case 'last90':
+        startDate.setDate(currentDate.getDate() - 90);
+        filterLabel = 'Last 90 Days';
+        break;
+      case 'thisMonth':
+        startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        filterLabel = 'This Month';
+        break;
+      case 'lastMonth':
+        startDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+        const lastMonthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0);
+        filterLabel = 'Last Month';
+        break;
+      case 'thisYear':
+        startDate = new Date(currentDate.getFullYear(), 0, 1);
+        filterLabel = 'This Year';
+        break;
+      default:
+        startDate.setDate(currentDate.getDate() - 30);
+    }
+    
+    // Filter transactions for selected date range
+    const filteredTransactions = mockTransactions.filter(transaction => {
       const transactionDate = new Date(transaction.date);
-      return transactionDate.getMonth() === currentMonth && 
-             transactionDate.getFullYear() === currentYear;
+      return transactionDate >= startDate && transactionDate <= currentDate;
     });
     
-    // Calculate income and expense totals
-    const income = thisMonthTransactions
+    // Update recent transactions
+    setRecentTransactions(filteredTransactions.slice(0, 5));
+    
+    // Calculate income and expense totals for the period
+    const income = filteredTransactions
       .filter(t => t.type === 'income')
       .reduce((sum, t) => sum + t.amount, 0);
       
-    const expense = thisMonthTransactions
+    const expense = filteredTransactions
       .filter(t => t.type === 'expense')
       .reduce((sum, t) => sum + t.amount, 0);
     
     setMonthlyIncome(income);
     setMonthlyExpense(expense);
-  }, []);
+  };
+  
+  const handleDateRangeChange = (range: string) => {
+    setDateRange(range);
+    setIsDateDropdownOpen(false);
+  };
   
   // Generate chart data
   const monthlyData = generateMonthlyData();
@@ -95,16 +139,76 @@ export default function Dashboard() {
     const category = mockCategories.find(c => c.id === categoryId);
     return category ? category.name : 'Unknown';
   };
+  
+  // Get date range label
+  const getDateRangeLabel = () => {
+    switch(dateRange) {
+      case 'last7': return 'Last 7 Days';
+      case 'last30': return 'Last 30 Days';
+      case 'last90': return 'Last 90 Days';
+      case 'thisMonth': return 'This Month';
+      case 'lastMonth': return 'Last Month';
+      case 'thisYear': return 'This Year';
+      default: return 'Last 30 Days';
+    }
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-        <div className="flex items-center space-x-2">
-          <button className="flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+        <div className="flex items-center space-x-2 relative">
+          <button 
+            className="flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+            onClick={() => setIsDateDropdownOpen(!isDateDropdownOpen)}
+          >
             <CalendarIcon className="h-4 w-4 mr-2" />
-            Last 30 Days
+            {getDateRangeLabel()}
+            <ChevronDownIcon className="h-4 w-4 ml-2" />
           </button>
+          
+          {isDateDropdownOpen && (
+            <div className="absolute right-0 mt-2 top-full z-10 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700">
+              <div className="py-1">
+                <button
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => handleDateRangeChange('last7')}
+                >
+                  Last 7 Days
+                </button>
+                <button
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => handleDateRangeChange('last30')}
+                >
+                  Last 30 Days
+                </button>
+                <button
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => handleDateRangeChange('last90')}
+                >
+                  Last 90 Days
+                </button>
+                <button
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => handleDateRangeChange('thisMonth')}
+                >
+                  This Month
+                </button>
+                <button
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => handleDateRangeChange('lastMonth')}
+                >
+                  Last Month
+                </button>
+                <button
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => handleDateRangeChange('thisYear')}
+                >
+                  This Year
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       
@@ -127,7 +231,7 @@ export default function Dashboard() {
               <ArrowUpIcon className="h-6 w-6" />
             </div>
             <div>
-              <h3 className="text-lg font-medium">Monthly Income</h3>
+              <h3 className="text-lg font-medium">{dateRange === 'thisMonth' || dateRange === 'lastMonth' ? 'Monthly' : 'Period'} Income</h3>
               <p className="text-2xl font-bold">{formatCurrency(monthlyIncome)}</p>
             </div>
           </div>
@@ -140,7 +244,7 @@ export default function Dashboard() {
               <ArrowDownIcon className="h-6 w-6" />
             </div>
             <div>
-              <h3 className="text-lg font-medium">Monthly Expense</h3>
+              <h3 className="text-lg font-medium">{dateRange === 'thisMonth' || dateRange === 'lastMonth' ? 'Monthly' : 'Period'} Expense</h3>
               <p className="text-2xl font-bold">{formatCurrency(monthlyExpense)}</p>
             </div>
           </div>
@@ -149,7 +253,7 @@ export default function Dashboard() {
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Monthly Overview Chart */}
-        <Card title="Monthly Overview">
+        <Card>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">Monthly Overview</h3>
             <button className="text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 flex items-center">
@@ -165,7 +269,7 @@ export default function Dashboard() {
         </Card>
         
         {/* Expense Breakdown Chart */}
-        <Card title="Expense Breakdown">
+        <Card>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">Expense Breakdown</h3>
             <button className="text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 flex items-center">
@@ -221,7 +325,7 @@ export default function Dashboard() {
                     {getCategoryName(transaction.categoryId)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                    {transaction.description}
+                    {transaction.notes || 'No description'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <span className={transaction.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
@@ -239,6 +343,13 @@ export default function Dashboard() {
                   </td>
                 </tr>
               ))}
+              {recentTransactions.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                    No transactions found for this period
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
