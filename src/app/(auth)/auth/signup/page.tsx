@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/Button';
 import { CurrencyDollarIcon } from '@heroicons/react/24/outline';
 import { showToast } from 'nextjs-toast-notify';
+import { useSession } from 'next-auth/react';
 
 export default function SignUpPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -18,6 +20,12 @@ export default function SignUpPage() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.push("/dashboard");
+    }
+  }, [status, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -65,45 +73,23 @@ export default function SignUpPage() {
       return;
     }
     setIsLoading(true);
-    
-      fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-        }),
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.error) {
-            setErrors({ form: data.error });
-            showToast.error(data.error, {
-              duration: 3000,
-              progress: true,
-              position: "top-right",
-              transition: "bounceIn",
-              icon: '',
-              sound: true,
-            });
-          } else {
-            showToast.success('Account created successfully!', {
-              duration: 3000,
-              progress: true,
-              position: "top-right",
-              transition: "bounceIn",
-              icon: '',
-              sound: true,
-            });
-            router.push('/auth/signin');
-          }
-        })
-        .catch(err => {
-          console.error(err); setErrors({ form: 'Error signing up' });
-          showToast.error('Error signing up', {
+
+    fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          setErrors({ form: data.error });
+          showToast.error(data.error, {
             duration: 3000,
             progress: true,
             position: "top-right",
@@ -111,10 +97,32 @@ export default function SignUpPage() {
             icon: '',
             sound: true,
           });
-        })
-        .finally(() => {
-          setIsLoading(false);
+        } else {
+          showToast.success('Account created successfully!', {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+          router.push('/auth/signin');
+        }
+      })
+      .catch(err => {
+        console.error(err); setErrors({ form: 'Error signing up' });
+        showToast.error('Error signing up', {
+          duration: 3000,
+          progress: true,
+          position: "top-right",
+          transition: "bounceIn",
+          icon: '',
+          sound: true,
         });
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
