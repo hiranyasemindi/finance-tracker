@@ -19,7 +19,7 @@ type NavItem = {
 };
 
 const navigation: NavItem[] = [
-  { name: "Dashboard", href: "/", icon: HomeIcon },
+  { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
   { name: "Transactions", href: "/transactions", icon: CreditCardIcon },
   { name: "Categories", href: "/categories", icon: FolderIcon },
   { name: "Reports", href: "/reports", icon: ChartBarIcon },
@@ -35,7 +35,7 @@ export default function Navigation() {
     <div className="flex h-full flex-col bg-white dark:bg-gray-800 shadow">
       <div className="flex flex-col flex-grow p-4 overflow-y-auto">
         <Link
-          href="/"
+          href="/dashboard"
           className="flex items-center mb-5 px-2 py-4"
         >
           <CurrencyDollarIcon className="h-8 w-8 text-green-600 dark:text-green-400" />
