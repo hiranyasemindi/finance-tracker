@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import Header from "@/components/Header";
 
@@ -10,6 +11,14 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
+  
+  // Don't show sidebar for auth pages
+  const isAuthPage = pathname.includes('/auth/');
+  
+  if (isAuthPage) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="flex h-screen overflow-hidden">
