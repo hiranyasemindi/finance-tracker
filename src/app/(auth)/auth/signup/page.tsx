@@ -10,7 +10,6 @@ import { useSession } from 'next-auth/react';
 
 export default function SignUpPage() {
   const router = useRouter();
-  const { data: session, status } = useSession();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -20,13 +19,7 @@ export default function SignUpPage() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    if (status === "authenticated") {
-      router.push("/dashboard");
-    }
-  }, [status, router]);
-
+  const { status } = useSession()
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -34,6 +27,12 @@ export default function SignUpPage() {
       [name]: type === 'checkbox' ? checked : value
     }));
   };
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.push('/')
+    }
+  }, [status, router])
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};

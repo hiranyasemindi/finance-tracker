@@ -10,7 +10,7 @@ import { showToast } from 'nextjs-toast-notify';
 
 export default function SignInPage() {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { status } = useSession()
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -21,7 +21,7 @@ export default function SignInPage() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      router.push("/dashboard"); 
+      router.push("/"); 
     }
   }, [status, router]);
 
