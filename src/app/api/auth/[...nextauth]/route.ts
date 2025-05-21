@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import CredentialsProvider from "next-auth/providers/credentials"
 
-export const authOptions = {
+export const authOptions = NextAuth({
     adapter: PrismaAdapter(prisma),
     providers: [
         CredentialsProvider({
@@ -48,16 +48,16 @@ export const authOptions = {
         async jwt({ token, user }) {
             if (user) {
                 token.id = user.id
-                token.preferredCurrency = user.preferredCurrency
-                token.isDarkMode = user.isDarkMode
+                token.preferredCurrency = (user as any).preferredCurrency
+                token.isDarkMode = (user as any).isDarkMode
             }
             return token
         },
         async session({ session, token }) {
             if (token) {
-                session.id = token.id as string
-                session.preferredCurrency = token.preferredCurrency as string
-                session.isDarkMode = token.isDarkMode as boolean
+                (session as any).id = token.id as string
+                (session as any).preferredCurrency = token.preferredCurrency as string
+                (session as any).isDarkMode = token.isDarkMode as boolean
             }
             return session
         }
@@ -66,6 +66,6 @@ export const authOptions = {
         signIn: "/auth/signin",
     },
     secret: process.env.NEXTAUTH_SECRET,
-}
+})
 
-export default NextAuth(authOptions)
+export { authOptions as GET, authOptions as POST }
