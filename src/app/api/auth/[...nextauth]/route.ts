@@ -45,12 +45,17 @@ export const authOptions = NextAuth({
         maxAge: 30 * 24 * 60 * 60, // 30 days
     },
     callbacks: {
-        async jwt({ token, user }) {
+        async jwt({ token, user, account, trigger, session }) {
             if (user) {
                 token.id = user.id
                 token.preferredCurrency = (user as any).preferredCurrency
                 token.isDarkMode = (user as any).isDarkMode
             }
+
+            if (trigger === "signIn" && session?.remember === "false") {
+                token.exp = Math.floor(Date.now() / 1000) + 60 * 60 * 6 // 6 hours
+            }
+
             return token
         },
         async session({ session, token }) {

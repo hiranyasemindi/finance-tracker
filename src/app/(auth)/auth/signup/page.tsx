@@ -65,7 +65,7 @@ export default function SignUpPage() {
       return;
     }
     setIsLoading(true);
-    try {
+    
       fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
@@ -111,14 +111,10 @@ export default function SignUpPage() {
             icon: '',
             sound: true,
           });
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
-    } catch (err: any) {
-      setErrors({
-        form: err.message || 'Failed to create account. Please try again.'
-      });
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   return (
