@@ -37,8 +37,10 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  password: string;
   preferredCurrency: string;
   isDarkMode: boolean;
+  createdAt: string; // ISO date string
 }
 
 export interface MonthlyReport {

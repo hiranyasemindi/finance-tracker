@@ -1,13 +1,16 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/Button';
 import { CurrencyDollarIcon } from '@heroicons/react/24/outline';
+import { signIn, useSession } from 'next-auth/react';
+import { showToast } from 'nextjs-toast-notify';
 
 export default function SignInPage() {
   const router = useRouter();
+  const { status } = useSession()
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -15,6 +18,12 @@ export default function SignInPage() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.push("/");
+    }
+  }, [status, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -29,25 +38,35 @@ export default function SignInPage() {
     setIsLoading(true);
     setError('');
 
-    try {
-      // Simulate authentication delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // In a real app, this would call an authentication API
-      // For demo purposes, we'll just redirect to the dashboard
-      // if the email and password are not empty
-      if (!formData.email || !formData.password) {
-        throw new Error('Please enter both email and password');
-      }
-      
-      console.log('Signing in with:', formData.email);
-      
-      // Redirect to dashboard
-      router.push('/');
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign in. Please try again.');
-    } finally {
+    const res = await signIn("credentials", {
+      email: formData.email,
+      password: formData.password,
+      remember: formData.rememberMe,
+      redirect: false,
+    });
+
+    if (res?.error) {
+      setError(res.error);
       setIsLoading(false);
+      showToast.error(res.error, {
+        duration: 3000,
+        progress: true,
+        position: "top-right",
+        transition: "bounceIn",
+        icon: '',
+        sound: true,
+      });
+    } else {
+      showToast.success('Successfully signed in!', {
+        duration: 3000,
+        progress: true,
+        position: "top-right",
+        transition: "bounceIn",
+        icon: '',
+        sound: true,
+      });
+      setIsLoading(false);
+      router.push('/');
     }
   };
 
@@ -66,8 +85,8 @@ export default function SignInPage() {
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
           Or{' '}
-          <Link 
-            href="/auth/signup" 
+          <Link
+            href="/auth/signup"
             className="font-medium text-green-600 hover:text-green-500 dark:text-green-400 dark:hover:text-green-300"
           >
             create a new account
@@ -82,7 +101,7 @@ export default function SignInPage() {
               <span className="block sm:inline">{error}</span>
             </div>
           )}
-          
+
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -138,8 +157,8 @@ export default function SignInPage() {
               </div>
 
               <div className="text-sm">
-                <Link 
-                  href="/auth/forgot-password" 
+                <Link
+                  href="/auth/forgot-password"
                   className="font-medium text-green-600 hover:text-green-500 dark:text-green-400 dark:hover:text-green-300"
                 >
                   Forgot your password?

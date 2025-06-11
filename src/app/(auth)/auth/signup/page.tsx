@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/Button';
 import { CurrencyDollarIcon } from '@heroicons/react/24/outline';
+import { showToast } from 'nextjs-toast-notify';
+import { useSession } from 'next-auth/react';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -17,7 +19,7 @@ export default function SignUpPage() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-
+  const { status } = useSession()
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -25,6 +27,12 @@ export default function SignUpPage() {
       [name]: type === 'checkbox' ? checked : value
     }));
   };
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.push('/')
+    }
+  }, [status, router])
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -59,29 +67,61 @@ export default function SignUpPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
     setIsLoading(true);
 
-    try {
-      // Simulate registration delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // In a real app, this would call a registration API
-      console.log('Creating account for:', formData.email);
-      
-      // Redirect to dashboard after successful signup
-      router.push('/');
-    } catch (err: any) {
-      setErrors({
-        form: err.message || 'Failed to create account. Please try again.'
+    fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          setErrors({ form: data.error });
+          showToast.error(data.error, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+        } else {
+          showToast.success('Account created successfully!', {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+          router.push('/auth/signin');
+        }
+      })
+      .catch(err => {
+        console.error(err); setErrors({ form: 'Error signing up' });
+        showToast.error('Error signing up', {
+          duration: 3000,
+          progress: true,
+          position: "top-right",
+          transition: "bounceIn",
+          icon: '',
+          sound: true,
+        });
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   return (
@@ -97,8 +137,8 @@ export default function SignUpPage() {
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
           Already have an account?{' '}
-          <Link 
-            href="/auth/signin" 
+          <Link
+            href="/auth/signin"
             className="font-medium text-green-600 hover:text-green-500 dark:text-green-400 dark:hover:text-green-300"
           >
             Sign in
@@ -113,7 +153,7 @@ export default function SignUpPage() {
               <span className="block sm:inline">{errors.form}</span>
             </div>
           )}
-          
+
           <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Name */}
             <div>
@@ -128,9 +168,8 @@ export default function SignUpPage() {
                   autoComplete="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className={`appearance-none block w-full px-3 py-2 border ${
-                    errors.name ? 'border-red-300' : 'border-gray-300 dark:border-gray-700'
-                  } rounded-md shadow-sm placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm dark:bg-gray-700 dark:text-white dark:placeholder-gray-400`}
+                  className={`appearance-none block w-full px-3 py-2 border ${errors.name ? 'border-red-300' : 'border-gray-300 dark:border-gray-700'
+                    } rounded-md shadow-sm placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm dark:bg-gray-700 dark:text-white dark:placeholder-gray-400`}
                   placeholder="John Doe"
                 />
                 {errors.name && (
@@ -152,9 +191,8 @@ export default function SignUpPage() {
                   autoComplete="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`appearance-none block w-full px-3 py-2 border ${
-                    errors.email ? 'border-red-300' : 'border-gray-300 dark:border-gray-700'
-                  } rounded-md shadow-sm placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm dark:bg-gray-700 dark:text-white dark:placeholder-gray-400`}
+                  className={`appearance-none block w-full px-3 py-2 border ${errors.email ? 'border-red-300' : 'border-gray-300 dark:border-gray-700'
+                    } rounded-md shadow-sm placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm dark:bg-gray-700 dark:text-white dark:placeholder-gray-400`}
                   placeholder="your@email.com"
                 />
                 {errors.email && (
@@ -176,9 +214,8 @@ export default function SignUpPage() {
                   autoComplete="new-password"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`appearance-none block w-full px-3 py-2 border ${
-                    errors.password ? 'border-red-300' : 'border-gray-300 dark:border-gray-700'
-                  } rounded-md shadow-sm placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm dark:bg-gray-700 dark:text-white dark:placeholder-gray-400`}
+                  className={`appearance-none block w-full px-3 py-2 border ${errors.password ? 'border-red-300' : 'border-gray-300 dark:border-gray-700'
+                    } rounded-md shadow-sm placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm dark:bg-gray-700 dark:text-white dark:placeholder-gray-400`}
                   placeholder="••••••••"
                 />
                 {errors.password && (
@@ -200,9 +237,8 @@ export default function SignUpPage() {
                   autoComplete="new-password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className={`appearance-none block w-full px-3 py-2 border ${
-                    errors.confirmPassword ? 'border-red-300' : 'border-gray-300 dark:border-gray-700'
-                  } rounded-md shadow-sm placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm dark:bg-gray-700 dark:text-white dark:placeholder-gray-400`}
+                  className={`appearance-none block w-full px-3 py-2 border ${errors.confirmPassword ? 'border-red-300' : 'border-gray-300 dark:border-gray-700'
+                    } rounded-md shadow-sm placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm dark:bg-gray-700 dark:text-white dark:placeholder-gray-400`}
                   placeholder="••••••••"
                 />
                 {errors.confirmPassword && (
@@ -219,21 +255,20 @@ export default function SignUpPage() {
                 type="checkbox"
                 checked={formData.agreeToTerms}
                 onChange={handleChange}
-                className={`h-4 w-4 ${
-                  errors.agreeToTerms ? 'border-red-300 text-red-600' : 'border-gray-300 text-green-600'
-                } focus:ring-green-500 rounded dark:border-gray-700 dark:bg-gray-700`}
+                className={`h-4 w-4 ${errors.agreeToTerms ? 'border-red-300 text-red-600' : 'border-gray-300 text-green-600'
+                  } focus:ring-green-500 rounded dark:border-gray-700 dark:bg-gray-700`}
               />
               <label htmlFor="agreeToTerms" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
                 I agree to the{' '}
-                <Link 
-                  href="#" 
+                <Link
+                  href="#"
                   className="font-medium text-green-600 hover:text-green-500 dark:text-green-400 dark:hover:text-green-300"
                 >
                   Terms of Service
                 </Link>{' '}
                 and{' '}
-                <Link 
-                  href="#" 
+                <Link
+                  href="#"
                   className="font-medium text-green-600 hover:text-green-500 dark:text-green-400 dark:hover:text-green-300"
                 >
                   Privacy Policy
