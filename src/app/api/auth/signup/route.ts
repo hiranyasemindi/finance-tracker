@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await prisma.user?.findUnique({
         where: {
             email,
         },
