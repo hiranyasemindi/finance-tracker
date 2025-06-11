@@ -124,7 +124,8 @@ exports.Prisma.CategoryScalarFieldEnum = {
   id: 'id',
   name: 'name',
   color: 'color',
-  type: 'type'
+  type: 'type',
+  userId: 'userId'
 };
 
 exports.Prisma.AccountScalarFieldEnum = {
