@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { CurrencyDollarIcon } from '@heroicons/react/24/outline';
 import Button from '@/components/Button';
+import { showToast } from 'nextjs-toast-notify';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -11,30 +12,44 @@ export default function ForgotPasswordPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
     setSuccess(false);
 
-    try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // In a real app, this would call a password reset API
-      if (!email) {
-        throw new Error('Please enter your email address');
-      }
-      
-      console.log('Sending password reset email to:', email);
-      
-      // Show success message
-      setSuccess(true);
-    } catch (err: any) {
-      setError(err.message || 'Failed to send password reset email. Please try again.');
-    } finally {
-      setIsLoading(false);
+    if (!email) {
+      showToast.error('Please enter your email address.');
+      return;
     }
+
+    fetch('/api/auth/forgot-password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          showToast.error(data.error);
+          setError(data.error);
+          return;
+        }
+        if (data.message) {
+          showToast.success(data.message);
+          setSuccess(true);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        showToast.error('Failed to send password reset email.');
+        setError(err.message || 'Failed to send password reset email. Please try again.');
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
@@ -60,14 +75,14 @@ export default function ForgotPasswordPage() {
               <span className="block sm:inline">{error}</span>
             </div>
           )}
-          
+
           {success ? (
             <div className="text-center">
               <div className="mb-4 bg-green-100 dark:bg-green-900 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-300 px-4 py-3 rounded relative" role="alert">
                 <span className="block sm:inline">Password reset email sent! Check your inbox for further instructions.</span>
               </div>
-              <Link 
-                href="/auth/signin" 
+              <Link
+                href="/auth/signin"
                 className="font-medium text-green-600 hover:text-green-500 dark:text-green-400 dark:hover:text-green-300"
               >
                 Return to sign in
@@ -103,10 +118,10 @@ export default function ForgotPasswordPage() {
                   {isLoading ? 'Sending...' : 'Send reset link'}
                 </Button>
               </div>
-              
+
               <div className="text-center">
-                <Link 
-                  href="/auth/signin" 
+                <Link
+                  href="/auth/signin"
                   className="font-medium text-green-600 hover:text-green-500 dark:text-green-400 dark:hover:text-green-300"
                 >
                   Back to sign in

@@ -21,7 +21,7 @@ export default function SignInPage() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      router.push("/"); 
+      router.push("/");
     }
   }, [status, router]);
 

@@ -146,6 +146,14 @@ exports.Prisma.UserScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.PasswordResetTokenScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  userId: 'userId',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -171,7 +179,8 @@ exports.AccountType = exports.$Enums.AccountType = {
 exports.Prisma.ModelName = {
   Category: 'Category',
   Account: 'Account',
-  User: 'User'
+  User: 'User',
+  PasswordResetToken: 'PasswordResetToken'
 };
 
 /**
