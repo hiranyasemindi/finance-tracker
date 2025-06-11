@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
@@ -12,19 +6,6 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-}
-
-enum TransactionType {
-  income
-  expense
-}
-
-enum AccountType {
-  bank
-  cash
-  credit
-  investment
-  other
 }
 
 model Category {
@@ -44,13 +25,38 @@ model Account {
 }
 
 model User {
-  id                String     @id @default(uuid())
-  name              String
-  email             String     @unique
-  password          String
-  preferredCurrency String     @default("LKR")
-  isDarkMode        Boolean    @default(false)
-  createdAt         DateTime   @default(now())
-  updatedAt DateTime @updatedAt
-  categories        Category[]
+  id                  String               @id @default(uuid())
+  name                String
+  email               String               @unique
+  password            String
+  preferredCurrency   String               @default("LKR")
+  isDarkMode          Boolean              @default(false)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  categories          Category[]
+  passwordResetTokens PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([token])
+}
+
+enum TransactionType {
+  income
+  expense
+}
+
+enum AccountType {
+  bank
+  cash
+  credit
+  investment
+  other
 }
