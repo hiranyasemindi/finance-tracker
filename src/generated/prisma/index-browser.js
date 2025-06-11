@@ -124,7 +124,8 @@ exports.Prisma.CategoryScalarFieldEnum = {
   id: 'id',
   name: 'name',
   color: 'color',
-  type: 'type'
+  type: 'type',
+  userId: 'userId'
 };
 
 exports.Prisma.AccountScalarFieldEnum = {
@@ -132,6 +133,25 @@ exports.Prisma.AccountScalarFieldEnum = {
   name: 'name',
   type: 'type',
   balance: 'balance'
+};
+
+exports.Prisma.UserScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  password: 'password',
+  preferredCurrency: 'preferredCurrency',
+  isDarkMode: 'isDarkMode',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PasswordResetTokenScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  userId: 'userId',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -158,7 +178,9 @@ exports.AccountType = exports.$Enums.AccountType = {
 
 exports.Prisma.ModelName = {
   Category: 'Category',
-  Account: 'Account'
+  Account: 'Account',
+  User: 'User',
+  PasswordResetToken: 'PasswordResetToken'
 };
 
 /**
