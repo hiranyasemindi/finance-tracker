@@ -28,25 +28,29 @@ enum AccountType {
 }
 
 model Category {
-  id    Int             @id @default(autoincrement())
-  name  String          @unique
-  color String
-  type  TransactionType
+  id     Int             @id @default(autoincrement())
+  name   String          @unique
+  color  String
+  type   TransactionType
+  userId String
+  user   User            @relation(fields: [userId], references: [id])
 }
 
 model Account {
-  id          Int          @id @default(autoincrement())
-  name        String       @unique
-  type        AccountType
-  balance     Float        @default(0)
+  id      Int         @id @default(autoincrement())
+  name    String      @unique
+  type    AccountType
+  balance Float       @default(0)
 }
 
 model User {
-  id        String       @id @default(uuid())
-  name      String
-  email     String    @unique
-  password  String
-  preferredCurrency String @default("LKR")
-  isDarkMode  Boolean @default(false)
-  createdAt DateTime  @default(now())
+  id                String     @id @default(uuid())
+  name              String
+  email             String     @unique
+  password          String
+  preferredCurrency String     @default("LKR")
+  isDarkMode        Boolean    @default(false)
+  createdAt         DateTime   @default(now())
+  updatedAt DateTime @updatedAt
+  categories        Category[]
 }
