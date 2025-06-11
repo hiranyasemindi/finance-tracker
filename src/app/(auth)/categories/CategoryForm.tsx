@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@/components/Button';
 import { Input, Select, FormGroup } from '@/components/form';
 import { Category, TransactionType } from '@/types';
@@ -36,10 +36,23 @@ export default function CategoryForm({
     name: '',
     type: defaultType,
     color: colorPalette[0],
+    userId: '',
     ...initialData
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        setFormData(prev => ({
+          ...prev,
+          userId
+        }));
+      }
+    }
+  }, []);
 
   const handleChange = (name: string, value: any) => {
     setFormData(prev => ({
@@ -72,7 +85,7 @@ export default function CategoryForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (validateForm()) {
       onSubmit(formData);
     }
@@ -119,9 +132,8 @@ export default function CategoryForm({
                 key={color}
                 type="button"
                 onClick={() => handleColorSelect(color)}
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  formData.color === color ? 'ring-2 ring-offset-2 ring-green-500' : ''
-                }`}
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${formData.color === color ? 'ring-2 ring-offset-2 ring-green-500' : ''
+                  }`}
                 style={{ backgroundColor: color }}
               >
                 {formData.color === color && (

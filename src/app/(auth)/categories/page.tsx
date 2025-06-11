@@ -11,13 +11,16 @@ import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 export default function CategoriesPage() {
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [activeTab, setActiveTab] = useState<TransactionType>('expense');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [loading, setLoading] = useState(true);
 
+
+
   const fetchCategories = async () => {
+    const userId = localStorage.getItem('userId')
     await fetch('/api/categories', {
       method: 'GET',
       headers: {
@@ -105,7 +108,7 @@ export default function CategoriesPage() {
 
         });
     } else {
-      // Add new category with generated ID
+      console.log(category)
       await fetch('/api/categories/add', {
         method: 'POST',
         headers: {
