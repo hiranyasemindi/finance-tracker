@@ -15,9 +15,13 @@ export const authOptions = {
                 remember: { label: "Remember Me", type: "checkbox" },
             },
             async authorize(credentials) {
+                if (!credentials?.email || !credentials?.password) {
+                    throw new Error("Email and password are required")
+                }
+
                 const user = await prisma.user.findUnique({
                     where: {
-                        email: credentials?.email,
+                        email: credentials.email,
                     },
                 })
 
@@ -26,7 +30,7 @@ export const authOptions = {
                 }
 
                 const isValidPassword = await bcrypt.compare(
-                    credentials?.password || "",
+                    credentials.password,
                     user.password
                 )
 
@@ -41,14 +45,25 @@ export const authOptions = {
                     preferredCurrency: user.preferredCurrency,
                     isDarkMode: user.isDarkMode,
                     createdAt: user.createdAt,
-                    remember: credentials?.remember === 'true',
+                    remember: credentials.remember === 'true' || credentials.remember === true,
                 }
             }
         }),
     ],
     session: {
         strategy: "jwt",
-        maxAge: 60 * 60, // seconds for testing (you might want to use 30 * 24 * 60 * 60 for 30 days)
+        maxAge: 24 * 60 * 60,
+    },
+    cookies: {
+        sessionToken: {
+            name: `next-auth.session-token`,
+            options: {
+                httpOnly: true,
+                sameSite: 'lax',
+                path: '/',
+                secure: process.env.NODE_ENV === 'production',
+            },
+        },
     },
     callbacks: {
         async jwt({ token, user }) {
@@ -58,11 +73,11 @@ export const authOptions = {
                 token.isDarkMode = user.isDarkMode
                 token.remember = user.remember
             }
-
-            if (token.remember === true) {
+            
+            if (token.remember) {
                 token.exp = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60 
             }
-
+            
             return token
         },
         async session({ session, token }) {
@@ -70,8 +85,18 @@ export const authOptions = {
                 session.user.id = token.id
                 session.user.preferredCurrency = token.preferredCurrency
                 session.user.isDarkMode = token.isDarkMode
+                session.expires = new Date(token.exp * 1000).toISOString()
             }
             return session
+        },
+        async signIn({ user }) {
+            console.log(user.remember)
+            if (user.remember) {
+                authOptions.cookies.sessionToken.options.maxAge = 30 * 24 * 60 * 60 // 30 days
+            } else {
+                authOptions.cookies.sessionToken.options.maxAge = 24 * 60 * 60 // 1 day
+            }
+            return true
         },
     },
     pages: {
@@ -80,6 +105,5 @@ export const authOptions = {
     secret: process.env.NEXTAUTH_SECRET,
 }
 
-// ✅ Export the handlers for GET and POST requests
 const handler = NextAuth(authOptions)
 export { handler as GET, handler as POST }
