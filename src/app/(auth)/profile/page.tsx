@@ -171,6 +171,50 @@ export default function ProfilePage() {
       });
   };
 
+  const handleResetData = () => {
+    fetch("/api/profile/reset", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          showToast.error(data.error, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          })
+          return
+        }
+        if (data.message) {
+          showToast.success(data.message, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          })
+        }
+      })
+      .catch(error => {
+        console.error(error)
+        showToast.error(`Something went wrong`, {
+          duration: 3000,
+          progress: true,
+          position: "top-right",
+          transition: "bounceIn",
+          icon: '',
+          sound: true,
+        });
+      })
+  }
+
   // Skeleton components
   const ProfileSkeleton = () => (
     <div className="space-y-4">
@@ -314,7 +358,7 @@ export default function ProfilePage() {
       {/* App Settings */}
       <Card>
         <h2 className="text-xl font-medium text-gray-900 dark:text-white mb-6">App Settings</h2>
-        
+
         {loading ? (
           <AppSettingsSkeleton />
         ) : (
@@ -384,7 +428,7 @@ export default function ProfilePage() {
       {/* Danger Zone */}
       <Card>
         <h2 className="text-xl font-medium text-red-600 dark:text-red-400 mb-4">Danger Zone</h2>
-        
+
         {loading ? (
           <DangerZoneSkeleton />
         ) : (
@@ -403,11 +447,7 @@ export default function ProfilePage() {
                 <Button
                   variant="danger"
                   size="sm"
-                  onClick={() => {
-                    if (window.confirm('Are you sure you want to reset all your data? This action cannot be undone.')) {
-                      alert('Data reset functionality would be implemented here');
-                    }
-                  }}
+                  onClick={handleResetData}
                 >
                   Reset Data
                 </Button>
