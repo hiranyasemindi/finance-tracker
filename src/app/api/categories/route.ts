@@ -9,9 +9,12 @@ export async function GET(req: NextRequest) {
         return token;
     }
 
+    // Explicitly type token as { id: string }
+    const { id: userId } = token as { id: string };
+
     try {
         // Get the authenticated user's ID from the token
-        const userId = token.id;
+        // const userId = token.id;
 
         // Fetch categories only for this user
         const categories = await prisma.category.findMany({

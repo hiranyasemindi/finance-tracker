@@ -29,7 +29,7 @@ export default function TransactionForm({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [availableCategories, setAvailableCategories] = useState([]);
+  const [availableCategories, setAvailableCategories] = useState<Category[]>([]);
 
   const fetchAndFilterCategories = () => {
     fetch('/api/categories', {
@@ -54,7 +54,7 @@ export default function TransactionForm({
         }
         setAvailableCategories(data.filter((category: Category) => category.type === formData.type));
         if (formData.categoryId) {
-          const category = data.find(c => c.id === formData.categoryId);
+            const category: Category | undefined = data.find((c: Category) => c.id === formData.categoryId);
           if (category && category.type !== formData.type) {
             setFormData(prev => ({ ...prev, categoryId: '' }));
           }
