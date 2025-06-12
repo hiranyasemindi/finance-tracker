@@ -16,6 +16,7 @@ export interface Category {
   name: string;
   type: TransactionType;
   color: string;
+  userId: string;
 }
 
 export interface Account {
@@ -63,12 +64,3 @@ export const formatCurrency = (amount: number, currency: string = 'USD') => {
   }).format(amount);
 };
 
-// Mock data for initial development
-export const mockCategories: Category[] = [
-  { id: '1', name: 'Salary', type: 'income', color: '#34D399' },
-  { id: '2', name: 'Food', type: 'expense', color: '#F87171' },
-  { id: '3', name: 'Transport', type: 'expense', color: '#60A5FA' },
-  { id: '4', name: 'Rent', type: 'expense', color: '#A78BFA' },
-  { id: '5', name: 'Entertainment', type: 'expense', color: '#FBBF24' },
-  { id: '6', name: 'Freelance', type: 'income', color: '#34D399' },
-]; 

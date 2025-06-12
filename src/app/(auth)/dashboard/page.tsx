@@ -216,9 +216,18 @@ export default function Dashboard() {
       const transactionDate = new Date(transaction.date);
       return transactionDate >= startDate && transactionDate <= currentDate;
     });
-    
+
+    // Ensure accountId is always a string (filter out or provide a fallback)
+    const sanitizedTransactions = filteredTransactions
+      .filter(t => typeof t.accountId === 'string')
+      .map(t => ({
+        ...t,
+        accountId: t.accountId as string,
+        notes: t.notes ?? '', // fallback for notes if needed
+      }));
+
     // Update recent transactions
-    setRecentTransactions(filteredTransactions.slice(0, 5));
+    setRecentTransactions(sanitizedTransactions.slice(0, 5));
     
     // Calculate income and expense totals for the period
     const income = filteredTransactions

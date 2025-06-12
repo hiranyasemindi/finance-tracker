@@ -5,12 +5,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/Button';
 import { CurrencyDollarIcon } from '@heroicons/react/24/outline';
-import { signIn, useSession } from 'next-auth/react';
+import { getSession, signIn, useSession } from 'next-auth/react';
 import { showToast } from 'nextjs-toast-notify';
 
 export default function SignInPage() {
   const router = useRouter();
-  const { status } = useSession()
+  const { status, data } = useSession()
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -57,6 +57,11 @@ export default function SignInPage() {
         sound: true,
       });
     } else {
+      const session = await getSession();
+      console.log(session)
+      if (session?.user?.id) {
+        localStorage.setItem('userId', session.user.id);
+      }
       showToast.success('Successfully signed in!', {
         duration: 3000,
         progress: true,
@@ -70,8 +75,6 @@ export default function SignInPage() {
     }
   };
 
-  // For demo purposes, we provide a simple sign-in flow
-  // In a real app, this would integrate with NextAuth.js
   return (
     <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">

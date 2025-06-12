@@ -2,14 +2,7 @@ import { Transaction, Category, Account, Budget, User, MonthlyReport } from '@/t
 
 // Mock Categories
 export const mockCategories: Category[] = [
-  { id: '1', name: 'Salary', type: 'income', color: '#34D399' },
-  { id: '2', name: 'Freelance', type: 'income', color: '#60A5FA' },
-  { id: '3', name: 'Food', type: 'expense', color: '#F87171' },
-  { id: '4', name: 'Transport', type: 'expense', color: '#FBBF24' },
-  { id: '5', name: 'Rent', type: 'expense', color: '#A78BFA' },
-  { id: '6', name: 'Entertainment', type: 'expense', color: '#EC4899' },
-  { id: '7', name: 'Shopping', type: 'expense', color: '#F97316' },
-  { id: '8', name: 'Utilities', type: 'expense', color: '#8B5CF6' },
+  { id: '1', name: 'Salary', type: 'income', color: '#34D399' , userId: '1'},
 ];
 
 // Mock Accounts
@@ -27,6 +20,8 @@ export const mockUser: User = {
   email: 'john.doe@example.com',
   preferredCurrency: 'USD',
   isDarkMode: false,
+  password: 'mockPassword123',
+  createdAt: new Date().toISOString(),
 };
 
 // Mock Transactions (last 3 months)
@@ -63,9 +58,9 @@ const generateRandomTransactions = (count: number): Transaction[] => {
       amount,
       type,
       date: date.toISOString().split('T')[0],
-      categoryId: category.id,
+      categoryId: category?.id,
       accountId,
-      notes: type === 'income' ? 'Monthly income' : `Payment for ${category.name.toLowerCase()}`,
+      notes: type === 'income' ? 'Monthly income' : `Payment for ${category?.name.toLowerCase()}`,
     });
   }
   

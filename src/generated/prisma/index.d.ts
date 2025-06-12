@@ -5718,15 +5718,15 @@ export namespace Prisma {
 
   export type CategoryWhereUniqueInput = Prisma.AtLeast<{
     id?: number
-    name?: string
     AND?: CategoryWhereInput | CategoryWhereInput[]
     OR?: CategoryWhereInput[]
     NOT?: CategoryWhereInput | CategoryWhereInput[]
+    name?: StringFilter<"Category"> | string
     color?: StringFilter<"Category"> | string
     type?: EnumTransactionTypeFilter<"Category"> | $Enums.TransactionType
     userId?: StringFilter<"Category"> | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
-  }, "id" | "name">
+  }, "id">
 
   export type CategoryOrderByWithAggregationInput = {
     id?: SortOrder
@@ -5771,13 +5771,13 @@ export namespace Prisma {
 
   export type AccountWhereUniqueInput = Prisma.AtLeast<{
     id?: number
-    name?: string
     AND?: AccountWhereInput | AccountWhereInput[]
     OR?: AccountWhereInput[]
     NOT?: AccountWhereInput | AccountWhereInput[]
+    name?: StringFilter<"Account"> | string
     type?: EnumAccountTypeFilter<"Account"> | $Enums.AccountType
     balance?: FloatFilter<"Account"> | number
-  }, "id" | "name">
+  }, "id">
 
   export type AccountOrderByWithAggregationInput = {
     id?: SortOrder

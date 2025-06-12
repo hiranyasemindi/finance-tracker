@@ -14,7 +14,8 @@ import { showToast } from "nextjs-toast-notify";
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState(mockTransactions);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [categories, setCategories] = useState([]);
+  type Category = { id: string; name: string };
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<any>(null);
 
@@ -54,7 +55,7 @@ export default function TransactionsPage() {
 
   // Apply filters
   useEffect(() => {
-    let filteredData = [...categories];
+    let filteredData = [...mockTransactions];
 
     // Filter by transaction type
     if (filterType !== "all") {

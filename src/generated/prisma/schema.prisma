@@ -10,7 +10,7 @@ datasource db {
 
 model Category {
   id     Int             @id @default(autoincrement())
-  name   String          @unique
+  name   String
   color  String
   type   TransactionType
   userId String
@@ -19,7 +19,7 @@ model Category {
 
 model Account {
   id      Int         @id @default(autoincrement())
-  name    String      @unique
+  name    String
   type    AccountType
   balance Float       @default(0)
 }
