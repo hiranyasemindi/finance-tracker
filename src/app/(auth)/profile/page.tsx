@@ -92,25 +92,111 @@ export default function ProfilePage() {
 
   // Handle currency change
   const handleCurrencyChange = (value: string) => {
-    setUser(prev => prev ? {
-      ...prev,
-      preferredCurrency: value
-    } : null);
+    fetch("/api/profile/change-currency", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ currency: value })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          showToast.error(data.error, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+          return
+        }
+        if (data.message) {
+          setUser(prev => prev ? {
+            ...prev,
+            preferredCurrency: value
+          } : null);
+          showToast.success(data.message, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+        }
+
+      })
+      .catch(error => {
+        console.log(error);
+        showToast.error(`Something went wrong`, {
+          duration: 3000,
+          progress: true,
+          position: "top-right",
+          transition: "bounceIn",
+          icon: '',
+          sound: true,
+        });
+      });
+
   };
 
   // Handle dark mode toggle
   const handleDarkModeToggle = () => {
     const newDarkMode = !isDarkMode;
-    setIsDarkMode(newDarkMode);
+    fetch("/api/profile/change-theme", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ isDarkMode: newDarkMode })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          showToast.error(data.error, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+          return
+        }
+        if (data.message) {
+          setIsDarkMode(newDarkMode);
 
-    // Also toggle dark mode class on document
-    if (newDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+          // Also toggle dark mode class on document
+          if (newDarkMode) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
 
-    setUser(prev => prev ? { ...prev, isDarkMode: newDarkMode } : null);
+          setUser(prev => prev ? { ...prev, isDarkMode: newDarkMode } : null);
+          showToast.success(data.message, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        showToast.error(`Something went wrong`, {
+          duration: 3000,
+          progress: true,
+          position: "top-right",
+          transition: "bounceIn",
+          icon: '',
+          sound: true,
+        });
+      });
   };
 
   // Handle profile form change
