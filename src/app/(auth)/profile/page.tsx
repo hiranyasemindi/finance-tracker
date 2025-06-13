@@ -53,9 +53,6 @@ export default function ProfilePage() {
           email: data.email,
         });
         setIsDarkMode(data.isDarkMode);
-        if (data.isDarkMode) {
-          document.documentElement.classList.add('dark');
-        }
       })
       .catch(error => {
         setLoading(false);
@@ -347,7 +344,6 @@ export default function ProfilePage() {
         });
       })
   }
-
 
   // Skeleton components
   const ProfileSkeleton = () => (
