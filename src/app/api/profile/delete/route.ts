@@ -1,9 +1,8 @@
 import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { error } from "console";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
+export async function DELETE(req: NextRequest) {
     const token = await requireAuth(req)
     if (token instanceof NextResponse) {
         return token;
@@ -32,9 +31,12 @@ export async function GET(req: NextRequest) {
             }),
             prisma.passwordResetToken.deleteMany({
                 where: { userId }
+            }),
+            prisma.user.delete({
+                where: { id: userId }
             })
         ])
-        return NextResponse.json({ message: "User data reset successfully." })
+        return NextResponse.json({ message: "User deleted successfully." })
     } catch (error) {
         console.error(error);
         return NextResponse.json(

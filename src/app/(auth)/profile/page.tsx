@@ -10,8 +10,11 @@ import { showToast } from 'nextjs-toast-notify';
 import { User } from '@/types';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { useRouter } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 
 export default function ProfilePage() {
+  const router = useRouter()
   const [user, setUser] = useState<User | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -118,7 +121,6 @@ export default function ProfilePage() {
     }));
   };
 
-  // Handle profile form submit
   const handleProfileFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     fetch("/api/profile/edit", {
@@ -214,6 +216,52 @@ export default function ProfilePage() {
         });
       })
   }
+
+  const handleDeleteAccountData = () => {
+    fetch("/api/profile/delete", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          showToast.error(data.error, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          })
+          return
+        }
+        if (data.message) {
+          showToast.success(data.message, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          })
+          signOut({ callbackUrl: '/auth/signin' });
+        }
+      })
+      .catch(error => {
+        console.error(error)
+        showToast.error(`Something went wrong`, {
+          duration: 3000,
+          progress: true,
+          position: "top-right",
+          transition: "bounceIn",
+          icon: '',
+          sound: true,
+        });
+      })
+  }
+
 
   // Skeleton components
   const ProfileSkeleton = () => (
@@ -463,11 +511,7 @@ export default function ProfilePage() {
                 <Button
                   variant="danger"
                   size="sm"
-                  onClick={() => {
-                    if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-                      alert('Account deletion functionality would be implemented here');
-                    }
-                  }}
+                  onClick={handleDeleteAccountData}
                 >
                   Delete Account
                 </Button>
