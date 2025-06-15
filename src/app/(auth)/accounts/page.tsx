@@ -148,7 +148,40 @@ export default function AccountsPage() {
 
   // Handle delete account
   const handleDeleteAccount = (id: string) => {
-    setAccounts(accounts.filter(a => a.id !== id));
+    fetch('/api/accounts/delete', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          console.error('Error deleting account:', data.error);
+        } else {
+          setAccounts(accounts.filter(account => account.id !== id));
+          showToast.success(`Account deleted successfully`, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error deleting account:', error);
+        showToast.error(`Error deleting account`, {
+          duration: 3000,
+          progress: true,
+          position: "top-right",
+          transition: "bounceIn",
+          icon: '',
+          sound: true,
+        });
+      });
   };
 
   // Get account type display name
