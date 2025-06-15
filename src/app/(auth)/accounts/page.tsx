@@ -1,17 +1,51 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
 import { mockAccounts } from '@/data/mockData';
-import { formatCurrency } from '@/types';
+import { Account, formatCurrency } from '@/types';
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import AccountForm from './AccountForm';
+import { showToast } from 'nextjs-toast-notify';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 export default function AccountsPage() {
-  const [accounts, setAccounts] = useState(mockAccounts);
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch('/api/accounts', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        setLoading(false);
+        setAccounts(data);
+      })
+      .catch(error => {
+        setLoading(false);
+        console.error('Error fetching accounts:', error);
+        showToast.error(`Error fetching accounts`, {
+          duration: 3000,
+          progress: true,
+          position: "top-right",
+          transition: "bounceIn",
+          icon: '',
+          sound: true,
+        });
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
   // Calculate total balance
   const totalBalance = accounts.reduce((sum, account) => sum + account.balance, 0);
@@ -29,10 +63,48 @@ export default function AccountsPage() {
   const handleAddAccount = (account: any) => {
     if (editingAccount) {
       // Update existing account
-      const updatedAccounts = accounts.map(a =>
-        a.id === editingAccount.id ? { ...account, id: editingAccount.id } : a
-      );
-      setAccounts(updatedAccounts);
+      fetch(`/api/accounts/edit`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(account),
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            console.error('Error updating account:', data.error);
+          } else {
+            // const updatedAccounts = accounts.map(a =>
+            //   a.id === editingAccount.id ? { ...account, id: editingAccount.id } : a
+            // );
+            // setAccounts(updatedAccounts);
+            setAccounts(accounts.map(a =>
+              a.id === editingAccount.id ? data : a
+            ));
+            setEditingAccount(null);
+            setIsFormOpen(false);
+            showToast.success(`Account updated successfully`, {
+              duration: 3000,
+              progress: true,
+              position: "top-right",
+              transition: "bounceIn",
+              icon: '',
+              sound: true,
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error updating account:', error);
+          showToast.error(`Error updating account`, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+        });
     } else {
       // Add new account with generated ID
       fetch('/api/accounts/add', {
@@ -48,8 +120,27 @@ export default function AccountsPage() {
             console.error('Error adding account:', data.error);
           } else {
             setAccounts([...accounts, data]);
+            showToast.success(`Account added successfully`, {
+              duration: 3000,
+              progress: true,
+              position: "top-right",
+              transition: "bounceIn",
+              icon: '',
+              sound: true,
+            });
           }
         })
+        .catch(error => {
+          console.error('Error adding account:', error);
+          showToast.error(`Error adding account`, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+        });
     }
     setIsFormOpen(false);
     setEditingAccount(null);
@@ -57,7 +148,40 @@ export default function AccountsPage() {
 
   // Handle delete account
   const handleDeleteAccount = (id: string) => {
-    setAccounts(accounts.filter(a => a.id !== id));
+    fetch('/api/accounts/delete', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          console.error('Error deleting account:', data.error);
+        } else {
+          setAccounts(accounts.filter(account => account.id !== id));
+          showToast.success(`Account deleted successfully`, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error deleting account:', error);
+        showToast.error(`Error deleting account`, {
+          duration: 3000,
+          progress: true,
+          position: "top-right",
+          transition: "bounceIn",
+          icon: '',
+          sound: true,
+        });
+      });
   };
 
   // Get account type display name
@@ -121,6 +245,38 @@ export default function AccountsPage() {
     }
   };
 
+  // Skeleton loading components
+  const renderSkeletonCards = (count: number) => {
+    return Array(count).fill(0).map((_, index) => (
+      <Card key={index}>
+        <div className="flex items-start justify-between">
+          <div className="flex items-center">
+            <Skeleton circle width={40} height={40} className="mr-3" />
+            <div>
+              <Skeleton width={120} height={20} className="mb-2" />
+              <Skeleton width={80} height={24} />
+            </div>
+          </div>
+          <div className="flex space-x-2">
+            <Skeleton circle width={20} height={20} />
+            <Skeleton circle width={20} height={20} />
+          </div>
+        </div>
+      </Card>
+    ));
+  };
+
+  const renderSkeletonGroups = () => {
+    return Array(3).fill(0).map((_, index) => (
+      <div key={index} className="space-y-4">
+        <Skeleton width={150} height={24} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {renderSkeletonCards(2)}
+        </div>
+      </div>
+    ));
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -138,16 +294,28 @@ export default function AccountsPage() {
       </div>
 
       {/* Total Balance Summary */}
-      <Card className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
-        <div className="flex flex-col items-center">
-          <h3 className="text-lg font-medium">Total Balance</h3>
-          <p className="text-3xl font-bold mt-2">{formatCurrency(totalBalance)}</p>
-          <p className="text-sm mt-2 opacity-80">Across {accounts.length} accounts</p>
-        </div>
-      </Card>
+      {loading ? (
+        <Card className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+          <div className="flex flex-col items-center">
+            <Skeleton width={120} height={24} className="bg-blue-400" />
+            <Skeleton width={150} height={36} className="mt-2 bg-blue-400" />
+            <Skeleton width={180} height={16} className="mt-2 bg-blue-400" />
+          </div>
+        </Card>
+      ) : (
+        <Card className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+          <div className="flex flex-col items-center">
+            <h3 className="text-lg font-medium">Total Balance</h3>
+            <p className="text-3xl font-bold mt-2">{formatCurrency(totalBalance)}</p>
+            <p className="text-sm mt-2 opacity-80">Across {accounts.length} accounts</p>
+          </div>
+        </Card>
+      )}
 
       {/* Accounts by Type */}
-      {Object.keys(accountsByType).length > 0 ? (
+      {loading ? (
+        renderSkeletonGroups()
+      ) : Object.keys(accountsByType).length > 0 ? (
         Object.keys(accountsByType).map(type => (
           <div key={type} className="space-y-4">
             <h2 className="text-xl font-medium text-gray-900 dark:text-white">
@@ -238,4 +406,4 @@ export default function AccountsPage() {
       )}
     </div>
   );
-} 
+}

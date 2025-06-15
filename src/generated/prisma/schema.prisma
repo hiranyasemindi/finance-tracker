@@ -10,7 +10,7 @@ datasource db {
 
 model Category {
   id     Int             @id @default(autoincrement())
-  name   String          @unique
+  name   String
   color  String
   type   TransactionType
   userId String
@@ -19,9 +19,11 @@ model Category {
 
 model Account {
   id      Int         @id @default(autoincrement())
-  name    String      @unique
+  name    String
   type    AccountType
   balance Float       @default(0)
+  userId  String
+  user    User        @relation(fields: [userId], references: [id])
 }
 
 model User {
@@ -34,7 +36,9 @@ model User {
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
   categories          Category[]
+  accounts            Account[]
   passwordResetTokens PasswordResetToken[]
+  accounts            Account[]
 }
 
 model PasswordResetToken {
