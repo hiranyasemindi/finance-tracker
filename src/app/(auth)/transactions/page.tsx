@@ -111,11 +111,51 @@ export default function TransactionsPage() {
       setEditingTransaction(null);
     } else {
       // Add new transaction with generated ID
-      const newTransaction = {
-        ...transaction,
-        id: `trans-${Date.now()}`,
-      };
-      setTransactions([newTransaction, ...transactions]);
+      fetch("/api/transactions/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(transaction),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.error) {
+            showToast.error(data.error, {
+              duration: 3000,
+              progress: true,
+              position: "top-right",
+              transition: "bounceIn",
+              icon: '',
+              sound: true,
+            })
+            return
+          }
+
+          if (data.message) {
+            setTransactions([...transactions, data.transaction]);
+            showToast.success(data.message, {
+              duration: 3000,
+              progress: true,
+              position: "top-right",
+              transition: "bounceIn",
+              icon: '',
+              sound: true,
+            })
+          }
+        })
+        .catch((error) => {
+          console.error("Error adding transaction:", error);
+          showToast.error(`Error adding transaction`, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+        });
+
     }
     setIsFormOpen(false);
   };
@@ -181,11 +221,10 @@ export default function TransactionsPage() {
       sortable: true,
       render: (transaction: any) => (
         <span
-          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-            transaction.type === "income"
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
-          }`}
+          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${transaction.type === "income"
+            ? "bg-green-100 text-green-800"
+            : "bg-red-100 text-red-800"
+            }`}
         >
           {transaction.type === "income" ? "Income" : "Expense"}
         </span>

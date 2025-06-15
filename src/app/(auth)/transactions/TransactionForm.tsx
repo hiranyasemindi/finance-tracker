@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Button from '@/components/Button';
 import { Input, Select, TextArea, FormGroup } from '@/components/form';
 import { mockCategories, mockAccounts } from '@/data/mockData';
-import { Category, Transaction } from '@/types';
+import { Account, Category, Transaction } from '@/types';
 import { showToast } from 'nextjs-toast-notify';
 
 interface TransactionFormProps {
@@ -30,6 +30,7 @@ export default function TransactionForm({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [availableCategories, setAvailableCategories] = useState<Category[]>([]);
+  const [availableAccounts, setAvailableAccounts] = useState<Account[]>([]);
 
   const fetchAndFilterCategories = () => {
     fetch('/api/categories', {
@@ -65,9 +66,37 @@ export default function TransactionForm({
       });
   }
 
+  const fetchAccounts = ()=>{
+    fetch('/api/accounts', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        setAvailableAccounts(data);
+      })
+      .catch(error => {
+        console.error('Error fetching accounts:', error);
+        showToast.error(`Error fetching accounts`, {
+          duration: 3000,
+          progress: true,
+          position: "top-right",
+          transition: "bounceIn",
+          icon: '',
+          sound: true,
+        });
+      })
+  }
+
   useEffect(() => {
     fetchAndFilterCategories();
   }, [formData.type]);
+
+  useEffect(() => {
+    fetchAccounts();
+  }, []);
 
   const handleChange = (name: string, value: any) => {
     setFormData(prev => ({
@@ -95,6 +124,10 @@ export default function TransactionForm({
       newErrors.accountId = 'Account is required';
     }
 
+    if(!formData.notes){
+      newErrors.notes = 'Notes are required';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -105,6 +138,7 @@ export default function TransactionForm({
     if (validateForm()) {
       onSubmit(formData);
     }
+
   };
 
   // Prepare options for select components
@@ -123,7 +157,7 @@ export default function TransactionForm({
 
   const accountOptions = [
     { value: '', label: 'Select an account' },
-    ...mockAccounts.map(account => ({
+    ...availableAccounts.map(account => ({
       value: account.id,
       label: account.name
     }))
@@ -196,9 +230,10 @@ export default function TransactionForm({
         name="notes"
         label="Notes"
         rows={3}
+        error={errors.notes}
         value={formData.notes}
         onChange={(e) => handleChange('notes', e.target.value)}
-        placeholder="Add any additional details..."
+        placeholder="Note for the payment..."
       />
 
       {/* Actions */}

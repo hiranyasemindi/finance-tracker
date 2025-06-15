@@ -1390,22 +1390,12 @@ export namespace Prisma {
 
   export type AggregateCategory = {
     _count: CategoryCountAggregateOutputType | null
-    _avg: CategoryAvgAggregateOutputType | null
-    _sum: CategorySumAggregateOutputType | null
     _min: CategoryMinAggregateOutputType | null
     _max: CategoryMaxAggregateOutputType | null
   }
 
-  export type CategoryAvgAggregateOutputType = {
-    id: number | null
-  }
-
-  export type CategorySumAggregateOutputType = {
-    id: number | null
-  }
-
   export type CategoryMinAggregateOutputType = {
-    id: number | null
+    id: string | null
     name: string | null
     color: string | null
     type: $Enums.TransactionType | null
@@ -1413,7 +1403,7 @@ export namespace Prisma {
   }
 
   export type CategoryMaxAggregateOutputType = {
-    id: number | null
+    id: string | null
     name: string | null
     color: string | null
     type: $Enums.TransactionType | null
@@ -1429,14 +1419,6 @@ export namespace Prisma {
     _all: number
   }
 
-
-  export type CategoryAvgAggregateInputType = {
-    id?: true
-  }
-
-  export type CategorySumAggregateInputType = {
-    id?: true
-  }
 
   export type CategoryMinAggregateInputType = {
     id?: true
@@ -1501,18 +1483,6 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Select which fields to average
-    **/
-    _avg?: CategoryAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: CategorySumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
      * Select which fields to find the minimum value
     **/
     _min?: CategoryMinAggregateInputType
@@ -1543,21 +1513,17 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: CategoryCountAggregateInputType | true
-    _avg?: CategoryAvgAggregateInputType
-    _sum?: CategorySumAggregateInputType
     _min?: CategoryMinAggregateInputType
     _max?: CategoryMaxAggregateInputType
   }
 
   export type CategoryGroupByOutputType = {
-    id: number
+    id: string
     name: string
     color: string
     type: $Enums.TransactionType
     userId: string
     _count: CategoryCountAggregateOutputType | null
-    _avg: CategoryAvgAggregateOutputType | null
-    _sum: CategorySumAggregateOutputType | null
     _min: CategoryMinAggregateOutputType | null
     _max: CategoryMaxAggregateOutputType | null
   }
@@ -1633,7 +1599,7 @@ export namespace Prisma {
       transactions: Prisma.$TransactionsPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
-      id: number
+      id: string
       name: string
       color: string
       type: $Enums.TransactionType
@@ -2063,7 +2029,7 @@ export namespace Prisma {
    * Fields of the Category model
    */
   interface CategoryFieldRefs {
-    readonly id: FieldRef<"Category", 'Int'>
+    readonly id: FieldRef<"Category", 'String'>
     readonly name: FieldRef<"Category", 'String'>
     readonly color: FieldRef<"Category", 'String'>
     readonly type: FieldRef<"Category", 'TransactionType'>
@@ -2519,17 +2485,15 @@ export namespace Prisma {
   }
 
   export type AccountAvgAggregateOutputType = {
-    id: number | null
     balance: number | null
   }
 
   export type AccountSumAggregateOutputType = {
-    id: number | null
     balance: number | null
   }
 
   export type AccountMinAggregateOutputType = {
-    id: number | null
+    id: string | null
     name: string | null
     type: $Enums.AccountType | null
     balance: number | null
@@ -2537,7 +2501,7 @@ export namespace Prisma {
   }
 
   export type AccountMaxAggregateOutputType = {
-    id: number | null
+    id: string | null
     name: string | null
     type: $Enums.AccountType | null
     balance: number | null
@@ -2555,12 +2519,10 @@ export namespace Prisma {
 
 
   export type AccountAvgAggregateInputType = {
-    id?: true
     balance?: true
   }
 
   export type AccountSumAggregateInputType = {
-    id?: true
     balance?: true
   }
 
@@ -2676,7 +2638,7 @@ export namespace Prisma {
   }
 
   export type AccountGroupByOutputType = {
-    id: number
+    id: string
     name: string
     type: $Enums.AccountType
     balance: number
@@ -2759,7 +2721,7 @@ export namespace Prisma {
       Transactions: Prisma.$TransactionsPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
-      id: number
+      id: string
       name: string
       type: $Enums.AccountType
       balance: number
@@ -3189,7 +3151,7 @@ export namespace Prisma {
    * Fields of the Account model
    */
   interface AccountFieldRefs {
-    readonly id: FieldRef<"Account", 'Int'>
+    readonly id: FieldRef<"Account", 'String'>
     readonly name: FieldRef<"Account", 'String'>
     readonly type: FieldRef<"Account", 'AccountType'>
     readonly balance: FieldRef<"Account", 'Float'>
@@ -5897,14 +5859,10 @@ export namespace Prisma {
 
   export type TransactionsAvgAggregateOutputType = {
     amount: number | null
-    categoryId: number | null
-    accountId: number | null
   }
 
   export type TransactionsSumAggregateOutputType = {
     amount: number | null
-    categoryId: number | null
-    accountId: number | null
   }
 
   export type TransactionsMinAggregateOutputType = {
@@ -5912,8 +5870,8 @@ export namespace Prisma {
     type: $Enums.TransactionType | null
     amount: number | null
     Date: Date | null
-    categoryId: number | null
-    accountId: number | null
+    categoryId: string | null
+    accountId: string | null
     userId: string | null
     note: string | null
   }
@@ -5923,8 +5881,8 @@ export namespace Prisma {
     type: $Enums.TransactionType | null
     amount: number | null
     Date: Date | null
-    categoryId: number | null
-    accountId: number | null
+    categoryId: string | null
+    accountId: string | null
     userId: string | null
     note: string | null
   }
@@ -5944,14 +5902,10 @@ export namespace Prisma {
 
   export type TransactionsAvgAggregateInputType = {
     amount?: true
-    categoryId?: true
-    accountId?: true
   }
 
   export type TransactionsSumAggregateInputType = {
     amount?: true
-    categoryId?: true
-    accountId?: true
   }
 
   export type TransactionsMinAggregateInputType = {
@@ -6079,8 +6033,8 @@ export namespace Prisma {
     type: $Enums.TransactionType
     amount: number
     Date: Date
-    categoryId: number
-    accountId: number
+    categoryId: string
+    accountId: string
     userId: string
     note: string
     _count: TransactionsCountAggregateOutputType | null
@@ -6186,8 +6140,8 @@ export namespace Prisma {
       type: $Enums.TransactionType
       amount: number
       Date: Date
-      categoryId: number
-      accountId: number
+      categoryId: string
+      accountId: string
       userId: string
       note: string
     }, ExtArgs["result"]["transactions"]>
@@ -6620,8 +6574,8 @@ export namespace Prisma {
     readonly type: FieldRef<"Transactions", 'TransactionType'>
     readonly amount: FieldRef<"Transactions", 'Float'>
     readonly Date: FieldRef<"Transactions", 'DateTime'>
-    readonly categoryId: FieldRef<"Transactions", 'Int'>
-    readonly accountId: FieldRef<"Transactions", 'Int'>
+    readonly categoryId: FieldRef<"Transactions", 'String'>
+    readonly accountId: FieldRef<"Transactions", 'String'>
     readonly userId: FieldRef<"Transactions", 'String'>
     readonly note: FieldRef<"Transactions", 'String'>
   }
@@ -7135,20 +7089,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Int'
-   */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-  /**
-   * Reference to a field of type 'Int[]'
-   */
-  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
-
-
-  /**
    * Reference to a field of type 'String'
    */
   export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>
@@ -7223,6 +7163,20 @@ export namespace Prisma {
    */
   export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
     
+
+
+  /**
+   * Reference to a field of type 'Int'
+   */
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int[]'
+   */
+  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
   /**
    * Deep Input Types
    */
@@ -7232,7 +7186,7 @@ export namespace Prisma {
     AND?: CategoryWhereInput | CategoryWhereInput[]
     OR?: CategoryWhereInput[]
     NOT?: CategoryWhereInput | CategoryWhereInput[]
-    id?: IntFilter<"Category"> | number
+    id?: StringFilter<"Category"> | string
     name?: StringFilter<"Category"> | string
     color?: StringFilter<"Category"> | string
     type?: EnumTransactionTypeFilter<"Category"> | $Enums.TransactionType
@@ -7252,7 +7206,7 @@ export namespace Prisma {
   }
 
   export type CategoryWhereUniqueInput = Prisma.AtLeast<{
-    id?: number
+    id?: string
     AND?: CategoryWhereInput | CategoryWhereInput[]
     OR?: CategoryWhereInput[]
     NOT?: CategoryWhereInput | CategoryWhereInput[]
@@ -7271,17 +7225,15 @@ export namespace Prisma {
     type?: SortOrder
     userId?: SortOrder
     _count?: CategoryCountOrderByAggregateInput
-    _avg?: CategoryAvgOrderByAggregateInput
     _max?: CategoryMaxOrderByAggregateInput
     _min?: CategoryMinOrderByAggregateInput
-    _sum?: CategorySumOrderByAggregateInput
   }
 
   export type CategoryScalarWhereWithAggregatesInput = {
     AND?: CategoryScalarWhereWithAggregatesInput | CategoryScalarWhereWithAggregatesInput[]
     OR?: CategoryScalarWhereWithAggregatesInput[]
     NOT?: CategoryScalarWhereWithAggregatesInput | CategoryScalarWhereWithAggregatesInput[]
-    id?: IntWithAggregatesFilter<"Category"> | number
+    id?: StringWithAggregatesFilter<"Category"> | string
     name?: StringWithAggregatesFilter<"Category"> | string
     color?: StringWithAggregatesFilter<"Category"> | string
     type?: EnumTransactionTypeWithAggregatesFilter<"Category"> | $Enums.TransactionType
@@ -7292,7 +7244,7 @@ export namespace Prisma {
     AND?: AccountWhereInput | AccountWhereInput[]
     OR?: AccountWhereInput[]
     NOT?: AccountWhereInput | AccountWhereInput[]
-    id?: IntFilter<"Account"> | number
+    id?: StringFilter<"Account"> | string
     name?: StringFilter<"Account"> | string
     type?: EnumAccountTypeFilter<"Account"> | $Enums.AccountType
     balance?: FloatFilter<"Account"> | number
@@ -7312,7 +7264,7 @@ export namespace Prisma {
   }
 
   export type AccountWhereUniqueInput = Prisma.AtLeast<{
-    id?: number
+    id?: string
     AND?: AccountWhereInput | AccountWhereInput[]
     OR?: AccountWhereInput[]
     NOT?: AccountWhereInput | AccountWhereInput[]
@@ -7341,7 +7293,7 @@ export namespace Prisma {
     AND?: AccountScalarWhereWithAggregatesInput | AccountScalarWhereWithAggregatesInput[]
     OR?: AccountScalarWhereWithAggregatesInput[]
     NOT?: AccountScalarWhereWithAggregatesInput | AccountScalarWhereWithAggregatesInput[]
-    id?: IntWithAggregatesFilter<"Account"> | number
+    id?: StringWithAggregatesFilter<"Account"> | string
     name?: StringWithAggregatesFilter<"Account"> | string
     type?: EnumAccountTypeWithAggregatesFilter<"Account"> | $Enums.AccountType
     balance?: FloatWithAggregatesFilter<"Account"> | number
@@ -7490,8 +7442,8 @@ export namespace Prisma {
     type?: EnumTransactionTypeFilter<"Transactions"> | $Enums.TransactionType
     amount?: FloatFilter<"Transactions"> | number
     Date?: DateTimeFilter<"Transactions"> | Date | string
-    categoryId?: IntFilter<"Transactions"> | number
-    accountId?: IntFilter<"Transactions"> | number
+    categoryId?: StringFilter<"Transactions"> | string
+    accountId?: StringFilter<"Transactions"> | string
     userId?: StringFilter<"Transactions"> | string
     note?: StringFilter<"Transactions"> | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -7521,8 +7473,8 @@ export namespace Prisma {
     type?: EnumTransactionTypeFilter<"Transactions"> | $Enums.TransactionType
     amount?: FloatFilter<"Transactions"> | number
     Date?: DateTimeFilter<"Transactions"> | Date | string
-    categoryId?: IntFilter<"Transactions"> | number
-    accountId?: IntFilter<"Transactions"> | number
+    categoryId?: StringFilter<"Transactions"> | string
+    accountId?: StringFilter<"Transactions"> | string
     userId?: StringFilter<"Transactions"> | string
     note?: StringFilter<"Transactions"> | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -7554,13 +7506,14 @@ export namespace Prisma {
     type?: EnumTransactionTypeWithAggregatesFilter<"Transactions"> | $Enums.TransactionType
     amount?: FloatWithAggregatesFilter<"Transactions"> | number
     Date?: DateTimeWithAggregatesFilter<"Transactions"> | Date | string
-    categoryId?: IntWithAggregatesFilter<"Transactions"> | number
-    accountId?: IntWithAggregatesFilter<"Transactions"> | number
+    categoryId?: StringWithAggregatesFilter<"Transactions"> | string
+    accountId?: StringWithAggregatesFilter<"Transactions"> | string
     userId?: StringWithAggregatesFilter<"Transactions"> | string
     note?: StringWithAggregatesFilter<"Transactions"> | string
   }
 
   export type CategoryCreateInput = {
+    id?: string
     name: string
     color: string
     type: $Enums.TransactionType
@@ -7569,7 +7522,7 @@ export namespace Prisma {
   }
 
   export type CategoryUncheckedCreateInput = {
-    id?: number
+    id?: string
     name: string
     color: string
     type: $Enums.TransactionType
@@ -7578,6 +7531,7 @@ export namespace Prisma {
   }
 
   export type CategoryUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     color?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
@@ -7586,7 +7540,7 @@ export namespace Prisma {
   }
 
   export type CategoryUncheckedUpdateInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     color?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
@@ -7595,7 +7549,7 @@ export namespace Prisma {
   }
 
   export type CategoryCreateManyInput = {
-    id?: number
+    id?: string
     name: string
     color: string
     type: $Enums.TransactionType
@@ -7603,13 +7557,14 @@ export namespace Prisma {
   }
 
   export type CategoryUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     color?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   }
 
   export type CategoryUncheckedUpdateManyInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     color?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
@@ -7617,6 +7572,7 @@ export namespace Prisma {
   }
 
   export type AccountCreateInput = {
+    id?: string
     name: string
     type: $Enums.AccountType
     balance?: number
@@ -7625,7 +7581,7 @@ export namespace Prisma {
   }
 
   export type AccountUncheckedCreateInput = {
-    id?: number
+    id?: string
     name: string
     type: $Enums.AccountType
     balance?: number
@@ -7634,6 +7590,7 @@ export namespace Prisma {
   }
 
   export type AccountUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     type?: EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
     balance?: FloatFieldUpdateOperationsInput | number
@@ -7642,7 +7599,7 @@ export namespace Prisma {
   }
 
   export type AccountUncheckedUpdateInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     type?: EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
     balance?: FloatFieldUpdateOperationsInput | number
@@ -7651,7 +7608,7 @@ export namespace Prisma {
   }
 
   export type AccountCreateManyInput = {
-    id?: number
+    id?: string
     name: string
     type: $Enums.AccountType
     balance?: number
@@ -7659,13 +7616,14 @@ export namespace Prisma {
   }
 
   export type AccountUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     type?: EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
     balance?: FloatFieldUpdateOperationsInput | number
   }
 
   export type AccountUncheckedUpdateManyInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     type?: EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
     balance?: FloatFieldUpdateOperationsInput | number
@@ -7836,8 +7794,8 @@ export namespace Prisma {
     type: $Enums.TransactionType
     amount: number
     Date: Date | string
-    categoryId: number
-    accountId: number
+    categoryId: string
+    accountId: string
     userId: string
     note: string
   }
@@ -7858,8 +7816,8 @@ export namespace Prisma {
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     amount?: FloatFieldUpdateOperationsInput | number
     Date?: DateTimeFieldUpdateOperationsInput | Date | string
-    categoryId?: IntFieldUpdateOperationsInput | number
-    accountId?: IntFieldUpdateOperationsInput | number
+    categoryId?: StringFieldUpdateOperationsInput | string
+    accountId?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     note?: StringFieldUpdateOperationsInput | string
   }
@@ -7869,8 +7827,8 @@ export namespace Prisma {
     type: $Enums.TransactionType
     amount: number
     Date: Date | string
-    categoryId: number
-    accountId: number
+    categoryId: string
+    accountId: string
     userId: string
     note: string
   }
@@ -7888,21 +7846,10 @@ export namespace Prisma {
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     amount?: FloatFieldUpdateOperationsInput | number
     Date?: DateTimeFieldUpdateOperationsInput | Date | string
-    categoryId?: IntFieldUpdateOperationsInput | number
-    accountId?: IntFieldUpdateOperationsInput | number
+    categoryId?: StringFieldUpdateOperationsInput | string
+    accountId?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     note?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -7950,10 +7897,6 @@ export namespace Prisma {
     userId?: SortOrder
   }
 
-  export type CategoryAvgOrderByAggregateInput = {
-    id?: SortOrder
-  }
-
   export type CategoryMaxOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -7968,26 +7911,6 @@ export namespace Prisma {
     color?: SortOrder
     type?: SortOrder
     userId?: SortOrder
-  }
-
-  export type CategorySumOrderByAggregateInput = {
-    id?: SortOrder
-  }
-
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -8045,7 +7968,6 @@ export namespace Prisma {
   }
 
   export type AccountAvgOrderByAggregateInput = {
-    id?: SortOrder
     balance?: SortOrder
   }
 
@@ -8066,7 +7988,6 @@ export namespace Prisma {
   }
 
   export type AccountSumOrderByAggregateInput = {
-    id?: SortOrder
     balance?: SortOrder
   }
 
@@ -8244,8 +8165,6 @@ export namespace Prisma {
 
   export type TransactionsAvgOrderByAggregateInput = {
     amount?: SortOrder
-    categoryId?: SortOrder
-    accountId?: SortOrder
   }
 
   export type TransactionsMaxOrderByAggregateInput = {
@@ -8272,8 +8191,6 @@ export namespace Prisma {
 
   export type TransactionsSumOrderByAggregateInput = {
     amount?: SortOrder
-    categoryId?: SortOrder
-    accountId?: SortOrder
   }
 
   export type UserCreateNestedOneWithoutCategoriesInput = {
@@ -8324,14 +8241,6 @@ export namespace Prisma {
     update?: TransactionsUpdateWithWhereUniqueWithoutCategoryInput | TransactionsUpdateWithWhereUniqueWithoutCategoryInput[]
     updateMany?: TransactionsUpdateManyWithWhereWithoutCategoryInput | TransactionsUpdateManyWithWhereWithoutCategoryInput[]
     deleteMany?: TransactionsScalarWhereInput | TransactionsScalarWhereInput[]
-  }
-
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
   }
 
   export type TransactionsUncheckedUpdateManyWithoutCategoryNestedInput = {
@@ -8648,17 +8557,6 @@ export namespace Prisma {
     update?: XOR<XOR<AccountUpdateToOneWithWhereWithoutTransactionsInput, AccountUpdateWithoutTransactionsInput>, AccountUncheckedUpdateWithoutTransactionsInput>
   }
 
-  export type NestedIntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
-  }
-
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -8680,33 +8578,6 @@ export namespace Prisma {
     not?: NestedEnumTransactionTypeFilter<$PrismaModel> | $Enums.TransactionType
   }
 
-  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
-  }
-
-  export type NestedFloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatFilter<$PrismaModel> | number
-  }
-
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -8724,6 +8595,17 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
+  export type NestedIntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
   export type NestedEnumTransactionTypeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.TransactionType | EnumTransactionTypeFieldRefInput<$PrismaModel>
     in?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
@@ -8739,6 +8621,17 @@ export namespace Prisma {
     in?: $Enums.AccountType[] | ListEnumAccountTypeFieldRefInput<$PrismaModel>
     notIn?: $Enums.AccountType[] | ListEnumAccountTypeFieldRefInput<$PrismaModel>
     not?: NestedEnumAccountTypeFilter<$PrismaModel> | $Enums.AccountType
+  }
+
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
   }
 
   export type NestedEnumAccountTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -8853,7 +8746,7 @@ export namespace Prisma {
     type: $Enums.TransactionType
     amount: number
     Date: Date | string
-    accountId: number
+    accountId: string
     userId: string
     note: string
   }
@@ -8931,8 +8824,8 @@ export namespace Prisma {
     type?: EnumTransactionTypeFilter<"Transactions"> | $Enums.TransactionType
     amount?: FloatFilter<"Transactions"> | number
     Date?: DateTimeFilter<"Transactions"> | Date | string
-    categoryId?: IntFilter<"Transactions"> | number
-    accountId?: IntFilter<"Transactions"> | number
+    categoryId?: StringFilter<"Transactions"> | string
+    accountId?: StringFilter<"Transactions"> | string
     userId?: StringFilter<"Transactions"> | string
     note?: StringFilter<"Transactions"> | string
   }
@@ -8985,7 +8878,7 @@ export namespace Prisma {
     type: $Enums.TransactionType
     amount: number
     Date: Date | string
-    categoryId: number
+    categoryId: string
     userId: string
     note: string
   }
@@ -9056,6 +8949,7 @@ export namespace Prisma {
   }
 
   export type CategoryCreateWithoutUserInput = {
+    id?: string
     name: string
     color: string
     type: $Enums.TransactionType
@@ -9063,7 +8957,7 @@ export namespace Prisma {
   }
 
   export type CategoryUncheckedCreateWithoutUserInput = {
-    id?: number
+    id?: string
     name: string
     color: string
     type: $Enums.TransactionType
@@ -9081,6 +8975,7 @@ export namespace Prisma {
   }
 
   export type AccountCreateWithoutUserInput = {
+    id?: string
     name: string
     type: $Enums.AccountType
     balance?: number
@@ -9088,7 +8983,7 @@ export namespace Prisma {
   }
 
   export type AccountUncheckedCreateWithoutUserInput = {
-    id?: number
+    id?: string
     name: string
     type: $Enums.AccountType
     balance?: number
@@ -9144,8 +9039,8 @@ export namespace Prisma {
     type: $Enums.TransactionType
     amount: number
     Date: Date | string
-    categoryId: number
-    accountId: number
+    categoryId: string
+    accountId: string
     note: string
   }
 
@@ -9179,7 +9074,7 @@ export namespace Prisma {
     AND?: CategoryScalarWhereInput | CategoryScalarWhereInput[]
     OR?: CategoryScalarWhereInput[]
     NOT?: CategoryScalarWhereInput | CategoryScalarWhereInput[]
-    id?: IntFilter<"Category"> | number
+    id?: StringFilter<"Category"> | string
     name?: StringFilter<"Category"> | string
     color?: StringFilter<"Category"> | string
     type?: EnumTransactionTypeFilter<"Category"> | $Enums.TransactionType
@@ -9206,7 +9101,7 @@ export namespace Prisma {
     AND?: AccountScalarWhereInput | AccountScalarWhereInput[]
     OR?: AccountScalarWhereInput[]
     NOT?: AccountScalarWhereInput | AccountScalarWhereInput[]
-    id?: IntFilter<"Account"> | number
+    id?: StringFilter<"Account"> | string
     name?: StringFilter<"Account"> | string
     type?: EnumAccountTypeFilter<"Account"> | $Enums.AccountType
     balance?: FloatFilter<"Account"> | number
@@ -9362,6 +9257,7 @@ export namespace Prisma {
   }
 
   export type CategoryCreateWithoutTransactionsInput = {
+    id?: string
     name: string
     color: string
     type: $Enums.TransactionType
@@ -9369,7 +9265,7 @@ export namespace Prisma {
   }
 
   export type CategoryUncheckedCreateWithoutTransactionsInput = {
-    id?: number
+    id?: string
     name: string
     color: string
     type: $Enums.TransactionType
@@ -9382,6 +9278,7 @@ export namespace Prisma {
   }
 
   export type AccountCreateWithoutTransactionsInput = {
+    id?: string
     name: string
     type: $Enums.AccountType
     balance?: number
@@ -9389,7 +9286,7 @@ export namespace Prisma {
   }
 
   export type AccountUncheckedCreateWithoutTransactionsInput = {
-    id?: number
+    id?: string
     name: string
     type: $Enums.AccountType
     balance?: number
@@ -9452,6 +9349,7 @@ export namespace Prisma {
   }
 
   export type CategoryUpdateWithoutTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     color?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
@@ -9459,7 +9357,7 @@ export namespace Prisma {
   }
 
   export type CategoryUncheckedUpdateWithoutTransactionsInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     color?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
@@ -9478,6 +9376,7 @@ export namespace Prisma {
   }
 
   export type AccountUpdateWithoutTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     type?: EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
     balance?: FloatFieldUpdateOperationsInput | number
@@ -9485,7 +9384,7 @@ export namespace Prisma {
   }
 
   export type AccountUncheckedUpdateWithoutTransactionsInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     type?: EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
     balance?: FloatFieldUpdateOperationsInput | number
@@ -9497,7 +9396,7 @@ export namespace Prisma {
     type: $Enums.TransactionType
     amount: number
     Date: Date | string
-    accountId: number
+    accountId: string
     userId: string
     note: string
   }
@@ -9517,7 +9416,7 @@ export namespace Prisma {
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     amount?: FloatFieldUpdateOperationsInput | number
     Date?: DateTimeFieldUpdateOperationsInput | Date | string
-    accountId?: IntFieldUpdateOperationsInput | number
+    accountId?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     note?: StringFieldUpdateOperationsInput | string
   }
@@ -9527,7 +9426,7 @@ export namespace Prisma {
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     amount?: FloatFieldUpdateOperationsInput | number
     Date?: DateTimeFieldUpdateOperationsInput | Date | string
-    accountId?: IntFieldUpdateOperationsInput | number
+    accountId?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     note?: StringFieldUpdateOperationsInput | string
   }
@@ -9537,7 +9436,7 @@ export namespace Prisma {
     type: $Enums.TransactionType
     amount: number
     Date: Date | string
-    categoryId: number
+    categoryId: string
     userId: string
     note: string
   }
@@ -9557,7 +9456,7 @@ export namespace Prisma {
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     amount?: FloatFieldUpdateOperationsInput | number
     Date?: DateTimeFieldUpdateOperationsInput | Date | string
-    categoryId?: IntFieldUpdateOperationsInput | number
+    categoryId?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     note?: StringFieldUpdateOperationsInput | string
   }
@@ -9567,20 +9466,20 @@ export namespace Prisma {
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     amount?: FloatFieldUpdateOperationsInput | number
     Date?: DateTimeFieldUpdateOperationsInput | Date | string
-    categoryId?: IntFieldUpdateOperationsInput | number
+    categoryId?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     note?: StringFieldUpdateOperationsInput | string
   }
 
   export type CategoryCreateManyUserInput = {
-    id?: number
+    id?: string
     name: string
     color: string
     type: $Enums.TransactionType
   }
 
   export type AccountCreateManyUserInput = {
-    id?: number
+    id?: string
     name: string
     type: $Enums.AccountType
     balance?: number
@@ -9598,12 +9497,13 @@ export namespace Prisma {
     type: $Enums.TransactionType
     amount: number
     Date: Date | string
-    categoryId: number
-    accountId: number
+    categoryId: string
+    accountId: string
     note: string
   }
 
   export type CategoryUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     color?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
@@ -9611,7 +9511,7 @@ export namespace Prisma {
   }
 
   export type CategoryUncheckedUpdateWithoutUserInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     color?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
@@ -9619,13 +9519,14 @@ export namespace Prisma {
   }
 
   export type CategoryUncheckedUpdateManyWithoutUserInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     color?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   }
 
   export type AccountUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     type?: EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
     balance?: FloatFieldUpdateOperationsInput | number
@@ -9633,7 +9534,7 @@ export namespace Prisma {
   }
 
   export type AccountUncheckedUpdateWithoutUserInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     type?: EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
     balance?: FloatFieldUpdateOperationsInput | number
@@ -9641,7 +9542,7 @@ export namespace Prisma {
   }
 
   export type AccountUncheckedUpdateManyWithoutUserInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     type?: EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
     balance?: FloatFieldUpdateOperationsInput | number
@@ -9683,8 +9584,8 @@ export namespace Prisma {
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     amount?: FloatFieldUpdateOperationsInput | number
     Date?: DateTimeFieldUpdateOperationsInput | Date | string
-    categoryId?: IntFieldUpdateOperationsInput | number
-    accountId?: IntFieldUpdateOperationsInput | number
+    categoryId?: StringFieldUpdateOperationsInput | string
+    accountId?: StringFieldUpdateOperationsInput | string
     note?: StringFieldUpdateOperationsInput | string
   }
 
@@ -9693,8 +9594,8 @@ export namespace Prisma {
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     amount?: FloatFieldUpdateOperationsInput | number
     Date?: DateTimeFieldUpdateOperationsInput | Date | string
-    categoryId?: IntFieldUpdateOperationsInput | number
-    accountId?: IntFieldUpdateOperationsInput | number
+    categoryId?: StringFieldUpdateOperationsInput | string
+    accountId?: StringFieldUpdateOperationsInput | string
     note?: StringFieldUpdateOperationsInput | string
   }
 

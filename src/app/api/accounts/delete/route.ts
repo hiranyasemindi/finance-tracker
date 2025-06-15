@@ -8,7 +8,7 @@ export async function DELETE(request: NextRequest) {
         return token;
     }
     const body = await request.json();
-    const { id }: { id: number } = body;
+    const { id }: { id: string } = body;
 
     if (!id) {
         return NextResponse.json({ error: "Missing required fields" }, { status: 400 });

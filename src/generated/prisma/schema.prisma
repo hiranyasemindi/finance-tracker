@@ -9,7 +9,7 @@ datasource db {
 }
 
 model Category {
-  id           Int             @id @default(autoincrement())
+  id           String          @id @default(uuid())
   name         String
   color        String
   type         TransactionType
@@ -19,7 +19,7 @@ model Category {
 }
 
 model Account {
-  id           Int            @id @default(autoincrement())
+  id           String         @id @default(uuid())
   name         String
   type         AccountType
   balance      Float          @default(0)
@@ -59,8 +59,8 @@ model Transactions {
   type       TransactionType
   amount     Float
   Date       DateTime
-  categoryId Int
-  accountId  Int
+  categoryId String
+  accountId  String
   userId     String
   note       String
   user       User            @relation(fields: [userId], references: [id])
