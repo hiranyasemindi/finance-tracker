@@ -133,14 +133,53 @@ export default function TransactionsPage() {
   // Handle new transaction
   const handleAddTransaction = (transaction: any) => {
     if (editingTransaction) {
+      fetch("/api/transactions/edit", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(transaction),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.error) {
+            showToast.error(data.error, {
+              duration: 3000,
+              progress: true,
+              position: "top-right",
+              transition: "bounceIn",
+              icon: "",
+              sound: true,
+            })
+            return
+          }
+          setTransactions((prevTransactions) =>
+            prevTransactions.map((t) =>
+              t.id === editingTransaction.id ? transaction : t
+            )
+          );
+          setEditingTransaction(null);
+          setIsFormOpen(false);
+        })
+        .catch((error) => {
+          console.error("Error updating transaction:", error);
+          showToast.error("Error updating transaction", {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: "",
+            sound: true,
+          })
+        });
       // Update existing transaction
-      const updatedTransactions = transactions.map((t) =>
-        t.id === editingTransaction.id
-          ? { ...transaction, id: editingTransaction.id }
-          : t
-      );
-      setTransactions(updatedTransactions);
-      setEditingTransaction(null);
+      // const updatedTransactions = transactions.map((t) =>
+      //   t.id === editingTransaction.id
+      //     ? { ...transaction, id: editingTransaction.id }
+      //     : t
+      // );
+      // setTransactions(updatedTransactions);
+      // setEditingTransaction(null);
     } else {
       // Add new transaction with generated ID
       fetch("/api/transactions/add", {
@@ -200,7 +239,40 @@ export default function TransactionsPage() {
 
   // Handle delete transaction
   const handleDeleteTransaction = (id: string) => {
-    setTransactions(transactions.filter((t) => t.id !== id));
+    fetch("/api/transactions/delete", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          showToast.error(data.error, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+          return
+        }
+        setTransactions(transactions.filter((t) => t.id !== id));
+      })
+      .catch((error) => {
+        console.error("Error deleting transaction:", error);
+        showToast.error(`Error deleting transaction`, {
+          duration: 3000,
+          progress: true,
+          position: "top-right",
+          transition: "bounceIn",
+          icon: '',
+          sound: true,
+        });
+      });
+
   };
 
   // Reset filters

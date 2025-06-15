@@ -10,11 +10,11 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, type, amount, date, categoryId, accountId, notes }: { id: string,type: TransactionType, amount: number, date: Date, categoryId: string, accountId: string, notes: string } = body;
+    const { id, type, amount, date, categoryId, accountId, notes }: { id: string, type: TransactionType, amount: number, date: Date, categoryId: string, accountId: string, notes: string } = body;
     if (!id || !type || !amount || !date || !categoryId || !accountId || !notes) {
         return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
-
+    const transactionDate = new Date(date);
     try {
         const transaction = await prisma.transactions.findUnique({
             where: { id },
@@ -28,7 +28,7 @@ export async function PUT(request: NextRequest) {
             data: {
                 type,
                 amount,
-                date,
+                date: transactionDate,
                 categoryId,
                 accountId,
                 notes,
