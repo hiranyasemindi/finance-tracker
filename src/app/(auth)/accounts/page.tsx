@@ -63,10 +63,48 @@ export default function AccountsPage() {
   const handleAddAccount = (account: any) => {
     if (editingAccount) {
       // Update existing account
-      const updatedAccounts = accounts.map(a =>
-        a.id === editingAccount.id ? { ...account, id: editingAccount.id } : a
-      );
-      setAccounts(updatedAccounts);
+      fetch(`/api/accounts/edit`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(account),
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            console.error('Error updating account:', data.error);
+          } else {
+            // const updatedAccounts = accounts.map(a =>
+            //   a.id === editingAccount.id ? { ...account, id: editingAccount.id } : a
+            // );
+            // setAccounts(updatedAccounts);
+            setAccounts(accounts.map(a =>
+              a.id === editingAccount.id ? data : a
+            ));
+            setEditingAccount(null);
+            setIsFormOpen(false);
+            showToast.success(`Account updated successfully`, {
+              duration: 3000,
+              progress: true,
+              position: "top-right",
+              transition: "bounceIn",
+              icon: '',
+              sound: true,
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error updating account:', error);
+          showToast.error(`Error updating account`, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+        });
     } else {
       // Add new account with generated ID
       fetch('/api/accounts/add', {
