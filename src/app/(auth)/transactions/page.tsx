@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Card from "@/components/Card";
 import Button from "@/components/Button";
 import DataTable from "@/components/DataTable";
-import { formatCurrency } from "@/types";
+import { formatCurrency, Transaction } from "@/types";
 import { mockTransactions } from "@/data/mockData";
 import { PlusIcon, FunnelIcon } from "@heroicons/react/24/outline";
 import TransactionForm from "./TransactionForm";
@@ -12,7 +12,7 @@ import { Input, Select, FormGroup } from "@/components/form";
 import { showToast } from "nextjs-toast-notify";
 
 export default function TransactionsPage() {
-  const [transactions, setTransactions] = useState(mockTransactions);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   type Category = { id: string; name: string };
   const [categories, setCategories] = useState<Category[]>([]);
@@ -28,6 +28,7 @@ export default function TransactionsPage() {
     min: string;
     max: string;
   }>({ min: "", max: "" });
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     fetch("/api/categories")
@@ -52,6 +53,29 @@ export default function TransactionsPage() {
         console.error("Error fetching categories:", error);
       });
   }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch("/api/transactions")
+      .then((response) => response.json())
+      .then((data) => {
+        setLoading(false);
+        console.log("Transactions:", data);
+        setTransactions(data);
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.error("Error fetching transactions:", error);
+        showToast.error(`Error fetching transactions`, {
+          duration: 3000,
+          progress: true,
+          position: "top-right",
+          transition: "bounceIn",
+          icon: "",
+          sound: true,
+        });
+      });
+  }, [])
 
   // Apply filters
   useEffect(() => {

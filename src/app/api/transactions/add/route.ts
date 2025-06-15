@@ -12,12 +12,13 @@ export async function POST(req: NextRequest) {
 
     const { id: userId } = token as { id: string }
     const body = await req.json()
-    const { type, amount, date, categoryId, accountId, notes }: { type: TransactionType, amount: number, date: Date, categoryId: number, accountId: number, notes: string } = body
+    const { type, amount, date, categoryId, accountId, notes }: { type: TransactionType, amount: number, date: Date, categoryId: string, accountId: string, notes: string } = body
 
     if (!type || !amount || !date || !categoryId || !accountId || !notes) {
         return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
+    const transactionDate = new Date(date); 
     try {
         const category = await prisma.category.findUnique({
             where: {
@@ -40,10 +41,10 @@ export async function POST(req: NextRequest) {
                 userId,
                 type,
                 amount,
-                Date: date,
+                date: transactionDate,
                 categoryId,
                 accountId,
-                note: notes
+                notes: notes
             }
         })
         if (!transaction) {

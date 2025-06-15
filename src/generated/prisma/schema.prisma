@@ -58,11 +58,11 @@ model Transactions {
   id         String          @id @default(uuid())
   type       TransactionType
   amount     Float
-  Date       DateTime
+  date       DateTime
   categoryId String
   accountId  String
   userId     String
-  note       String
+  notes      String
   user       User            @relation(fields: [userId], references: [id])
   category   Category        @relation(fields: [categoryId], references: [id])
   account    Account         @relation(fields: [accountId], references: [id])

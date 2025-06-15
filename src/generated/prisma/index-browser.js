@@ -159,11 +159,11 @@ exports.Prisma.TransactionsScalarFieldEnum = {
   id: 'id',
   type: 'type',
   amount: 'amount',
-  Date: 'Date',
+  date: 'date',
   categoryId: 'categoryId',
   accountId: 'accountId',
   userId: 'userId',
-  note: 'note'
+  notes: 'notes'
 };
 
 exports.Prisma.SortOrder = {
