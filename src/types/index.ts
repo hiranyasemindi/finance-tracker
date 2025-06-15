@@ -24,6 +24,7 @@ export interface Account {
   name: string;
   balance: number;
   type: AccountType;
+  userId: string;
 }
 
 export interface Budget {
