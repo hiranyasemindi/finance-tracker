@@ -15,6 +15,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [initialTransactions, setInitialTransactions] = useState<Transaction[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   type Category = { id: string; name: string };
   const [categories, setCategories] = useState<Category[]>([]);
@@ -68,6 +69,7 @@ export default function TransactionsPage() {
         setLoading(false);
         console.log("Transactions:", data);
         setTransactions(data);
+        setInitialTransactions(data);
       })
       .catch((error) => {
         setLoading(false);
@@ -85,7 +87,7 @@ export default function TransactionsPage() {
 
   // Apply filters
   useEffect(() => {
-    let filteredData = [...mockTransactions];
+    let filteredData = [...initialTransactions];
 
     // Filter by transaction type
     if (filterType !== "all") {
