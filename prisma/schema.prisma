@@ -38,6 +38,8 @@ model User {
   categories          Category[]
   accounts            Account[]
   passwordResetTokens PasswordResetToken[]
+  accounts            Account[]
+
 }
 
 model PasswordResetToken {

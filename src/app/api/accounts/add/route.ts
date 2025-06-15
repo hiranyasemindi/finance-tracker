@@ -9,7 +9,6 @@ export async function POST(request: NextRequest) {
         return token;
     }
     const { id: userId } = token as { id: string };
-
     const body = await request.json();
     const { name, balance, type }: { name: string; balance: number; type: AccountType } = body;
 
