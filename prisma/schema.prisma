@@ -22,6 +22,8 @@ model Account {
   name    String      
   type    AccountType
   balance Float       @default(0)
+  userId  String
+  user    User        @relation(fields: [userId], references: [id])
 }
 
 model User {
@@ -35,6 +37,8 @@ model User {
   updatedAt           DateTime             @updatedAt
   categories          Category[]
   passwordResetTokens PasswordResetToken[]
+  accounts            Account[]
+
 }
 
 model PasswordResetToken {
