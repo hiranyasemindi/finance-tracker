@@ -8,12 +8,11 @@ export async function POST(request: NextRequest) {
     if (token instanceof NextResponse) {
         return token;
     }
-
     const { id: userId } = token as { id: string };
     const body = await request.json();
     const { name, balance, type }: { name: string; balance: number; type: AccountType } = body;
 
-    if (!name || !balance || !type) {
+    if (!name || !balance || !type || !userId) {
         return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 

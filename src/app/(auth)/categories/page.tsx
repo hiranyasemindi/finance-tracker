@@ -140,6 +140,17 @@ export default function CategoriesPage() {
             });
           }
         })
+        .catch(error => {
+          console.error('Error adding category:', error);
+          showToast.error(`Error adding categories`, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+        });
     }
     setIsFormOpen(false);
     setEditingCategory(null);
