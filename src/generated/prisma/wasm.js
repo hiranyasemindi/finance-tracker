@@ -166,6 +166,15 @@ exports.Prisma.TransactionsScalarFieldEnum = {
   notes: 'notes'
 };
 
+exports.Prisma.BudgetScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  categoryId: 'categoryId',
+  amount: 'amount',
+  month: 'month',
+  spent: 'spent'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -193,7 +202,8 @@ exports.Prisma.ModelName = {
   Account: 'Account',
   User: 'User',
   PasswordResetToken: 'PasswordResetToken',
-  Transactions: 'Transactions'
+  Transactions: 'Transactions',
+  Budget: 'Budget'
 };
 
 /**

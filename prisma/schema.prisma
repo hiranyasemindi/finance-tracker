@@ -16,6 +16,7 @@ model Category {
   userId      String
   user        User            @relation(fields: [userId], references: [id])
   transactions Transactions[] 
+  budgets     Budget[]         // Added relation to Budget
 }
 
 model Account {
@@ -41,6 +42,7 @@ model User {
   accounts            Account[]
   passwordResetTokens PasswordResetToken[]
   transactions        Transactions[]     
+  budgets             Budget[]
 }
 
 model PasswordResetToken {
@@ -65,6 +67,17 @@ model Transactions{
   user User @relation(fields: [userId], references: [id])
   category Category @relation(fields: [categoryId], references: [id])
   account Account @relation(fields: [accountId], references: [id])
+}
+
+model Budget{
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  categoryId String
+  category Category @relation(fields: [categoryId], references: [id])
+  amount Float
+  month String //2024-11
+  spent Float @default(0)
 }
 
 enum TransactionType {

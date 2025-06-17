@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    const transactionDate = new Date(date); 
+    const transactionDate = new Date(date);
     try {
         const category = await prisma.category.findUnique({
             where: {
@@ -36,6 +36,13 @@ export async function POST(req: NextRequest) {
         if (!account) {
             return NextResponse.json({ error: 'Account not found' }, { status: 400 })
         }
+        const haveBudget = await prisma.budget.findFirst({
+            where: {
+                userId,
+                categoryId,
+                month: transactionDate.toISOString().slice(0, 7)
+            }
+        })
         const transaction = await prisma.transactions.create({
             data: {
                 userId,
@@ -47,6 +54,17 @@ export async function POST(req: NextRequest) {
                 notes: notes
             }
         })
+        if (haveBudget) {
+            const updatedBudget = await prisma.budget.update({
+                where: {
+                    id: haveBudget.id
+                },
+                data: {
+                    spent: haveBudget.spent + amount
+                }
+            })
+            console.log(updatedBudget)
+        }
         if (!transaction) {
             return NextResponse.json({ error: 'Failed to create transaction' }, { status: 400 })
         }
