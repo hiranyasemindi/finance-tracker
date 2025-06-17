@@ -9,21 +9,24 @@ datasource db {
 }
 
 model Category {
-  id     Int             @id @default(autoincrement())
-  name   String          
-  color  String
-  type   TransactionType
-  userId String
-  user   User            @relation(fields: [userId], references: [id])
+  id          String             @id @default(uuid())
+  name        String          
+  color       String
+  type        TransactionType
+  userId      String
+  user        User            @relation(fields: [userId], references: [id])
+  transactions Transactions[] 
+  budgets     Budget[]         // Added relation to Budget
 }
 
 model Account {
-  id      Int         @id @default(autoincrement())
+  id      String         @id @default(uuid())
   name    String      
   type    AccountType
   balance Float       @default(0)
   userId  String
   user    User        @relation(fields: [userId], references: [id])
+  Transactions Transactions[]
 }
 
 model User {
@@ -38,8 +41,8 @@ model User {
   categories          Category[]
   accounts            Account[]
   passwordResetTokens PasswordResetToken[]
-  accounts            Account[]
-
+  transactions        Transactions[]     
+  budgets             Budget[]
 }
 
 model PasswordResetToken {
@@ -51,6 +54,30 @@ model PasswordResetToken {
   user      User     @relation(fields: [userId], references: [id])
 
   @@index([token])
+}
+model Transactions{
+  id String @id @default(uuid())
+  type TransactionType
+  amount Float
+  date DateTime
+  categoryId String
+  accountId String
+  userId String
+  notes String
+  user User @relation(fields: [userId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+  account Account @relation(fields: [accountId], references: [id])
+}
+
+model Budget{
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  categoryId String
+  category Category @relation(fields: [categoryId], references: [id])
+  amount Float
+  month String //2024-11
+  spent Float @default(0)
 }
 
 enum TransactionType {

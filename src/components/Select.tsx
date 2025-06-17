@@ -24,7 +24,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
     };
 
     return (
-      <div className={`${fullWidth ? 'w-full' : ''} mb-4`}>
+      <div className={`${fullWidth ? 'w-full' : ''} `}>
         {label && (
           <label 
             htmlFor={props.id} 

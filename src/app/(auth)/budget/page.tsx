@@ -1,36 +1,101 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
-import { mockBudgets, mockCategories } from '@/data/mockData';
-import { formatCurrency } from '@/types';
+import { Budget, Category, formatCurrency } from '@/types';
 import { PlusIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import BudgetForm from './BudgetForm';
 import { Select } from '@/components/form';
+import { showToast } from 'nextjs-toast-notify';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 export default function BudgetPage() {
-  const [budgets, setBudgets] = useState(mockBudgets);
+  const [budgets, setBudgets] = useState<Budget[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState<any>(null);
-  const [activeMonth, setActiveMonth] = useState<string>('2023-11'); // Default to November 2023
-  
+  const [activeMonth, setActiveMonth] = useState<string>(
+    new Date().toISOString().slice(0, 7)
+  );
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Fetch categories
+        const categoriesResponse = await fetch('/api/categories', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        const categoriesData = await categoriesResponse.json();
+        if (categoriesData.error) {
+          showToast.error(`Error fetching categories`, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+          console.error('Error fetching categories:', categoriesData.error);
+        } else {
+          setCategories(categoriesData);
+        }
+
+        // Fetch budgets
+        const budgetsResponse = await fetch('/api/budget', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        const budgetsData = await budgetsResponse.json();
+        if (budgetsData.error) {
+          showToast.error(`Error fetching budgets`, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+          console.error('Error fetching budgets:', budgetsData.error);
+        } else {
+          setBudgets(budgetsData);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   // Filter budgets by active month
   const filteredBudgets = budgets.filter(budget => budget.month === activeMonth);
-  
+
   // Calculate total budget and spent amount
   const totalBudget = filteredBudgets.reduce((sum, budget) => sum + budget.amount, 0);
   const totalSpent = filteredBudgets.reduce((sum, budget) => sum + budget.spent, 0);
-  
+
   // Get all months from the budgets data
   const getUniqueMonths = () => {
     const months = budgets.map(budget => budget.month);
     return [...new Set(months)];
   };
-  
+
   // Format month for display (YYYY-MM to Month YYYY)
-  const formatMonth = (monthStr: string) => {
-    const [year, month] = monthStr.split('-');
+  const formatMonth = (monthStr: string, func: string) => {
+    console.log(monthStr, func);
+    const [year, month] = monthStr?.split('-');
     const date = new Date(parseInt(year), parseInt(month) - 1);
     return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   };
@@ -38,38 +103,145 @@ export default function BudgetPage() {
   // Handle new budget
   const handleAddBudget = (budget: any) => {
     if (editingBudget) {
-      // Update existing budget
-      const updatedBudgets = budgets.map(b => 
-        b.id === editingBudget.id ? { ...budget, id: editingBudget.id } : b
-      );
-      setBudgets(updatedBudgets);
+      fetch('/api/budget/edit', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(budget)
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            showToast.error(data.error, {
+              duration: 3000,
+              progress: true,
+              position: "top-right",
+              transition: "bounceIn",
+              icon: '',
+              sound: true,
+            })
+            return
+          }
+          const updatedBudgets = budgets.map(b =>
+            b.id === editingBudget.id ? { ...budget, id: editingBudget.id } : b
+          );
+          setBudgets(updatedBudgets);
+          showToast.success(data.message, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+          setIsFormOpen(false);
+          setEditingBudget(null);
+        })
+        .catch(error => {
+          console.error('Error updating budget:', error);
+          showToast.error('Error updating budget', {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          })
+        });
     } else {
-      // Add new budget with generated ID
-      const newBudget = {
-        ...budget,
-        id: `budget-${Date.now()}`,
-        spent: 0, // Default spent to 0 for new budgets
-      };
-      setBudgets([...budgets, newBudget]);
+      fetch('/api/budget/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(budget)
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            showToast.error(data.error, {
+              duration: 3000,
+              progress: true,
+              position: "top-right",
+              transition: "bounceIn",
+              icon: '',
+              sound: true,
+            })
+          } else {
+            setBudgets([...budgets, data.budget]);
+            showToast.success('Budget added successfully', {
+              duration: 3000,
+              progress: true,
+              position: "top-right",
+              transition: "bounceIn",
+              icon: '',
+              sound: true,
+            })
+            setIsFormOpen(false);
+            setEditingBudget(null);
+          }
+        })
+        .catch(error => {
+          console.error('Error adding budget:', error);
+        });
     }
-    setIsFormOpen(false);
-    setEditingBudget(null);
   };
 
   // Handle delete budget
   const handleDeleteBudget = (id: string) => {
-    setBudgets(budgets.filter(b => b.id !== id));
+    fetch('/api/budget/delete', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ id })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          showToast.error(data.error, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          })
+        } else {
+          showToast.success("Budget deleted successfully", {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          })
+          setBudgets(budgets.filter(b => b.id !== id));
+        }
+      })
+      .catch(error => {
+        console.error('Error deleting budget:', error);
+        showToast.error('Error deleting budget', {
+          duration: 3000,
+          progress: true,
+          position: "top-right",
+          transition: "bounceIn",
+          icon: '',
+          sound: true,
+        })
+      });
   };
 
   // Get category name by ID
   const getCategoryName = (categoryId: string) => {
-    const category = mockCategories.find(c => c.id === categoryId);
+    const category = categories?.find(c => c.id === categoryId);
     return category ? category.name : 'Unknown';
   };
 
   // Get category color by ID
   const getCategoryColor = (categoryId: string) => {
-    const category = mockCategories.find(c => c.id === categoryId);
+    const category = categories?.find(c => c.id === categoryId);
     return category ? category.color : '#gray';
   };
 
@@ -83,104 +255,172 @@ export default function BudgetPage() {
     return spent > amount;
   };
 
+  // Skeleton components
+  const SummarySkeleton = () => (
+    <Card>
+      <div className="flex flex-col">
+        <Skeleton height={24} width={150} />
+        <Skeleton height={32} className="mt-2" />
+        <div className="mt-4">
+          <div className="flex justify-between mb-1">
+            <Skeleton height={16} width={100} />
+            <Skeleton height={16} width={80} />
+          </div>
+          <Skeleton height={10} />
+        </div>
+      </div>
+    </Card>
+  );
+
+  const BudgetCardSkeleton = () => (
+    <Card>
+      <div className="flex justify-between items-start mb-4">
+        <div className="flex items-center">
+          <Skeleton circle height={32} width={32} className="mr-3" />
+          <div>
+            <Skeleton height={20} width={120} />
+            <Skeleton height={16} width={80} className="mt-1" />
+          </div>
+        </div>
+        <div className="flex space-x-2">
+          <Skeleton height={32} width={60} />
+          <Skeleton height={32} width={70} />
+        </div>
+      </div>
+      <div>
+        <div className="flex justify-between mb-1">
+          <Skeleton height={16} width={100} />
+          <Skeleton height={16} width={100} />
+        </div>
+        <Skeleton height={10} className="mb-2" />
+        <div className="flex justify-between">
+          <Skeleton height={16} width={120} />
+          <Skeleton height={16} width={60} />
+        </div>
+      </div>
+    </Card>
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Budget Planning</h1>
-        
-        <div className="flex items-center gap-4">
+
+        <div className="flex items-center justify-center gap-4">
           {/* Month selector */}
           <div className="flex items-center h-10">
-            <Select
-              id="month-selector"
-              name="month"
-              value={activeMonth}
-              onChange={(value) => setActiveMonth(value)}
-              options={getUniqueMonths().map((month) => ({
-                value: month,
-                label: formatMonth(month)
-              }))}
-              className="mb-0 w-52"
-              fullWidth={false}
-            />
+            {isLoading ? (
+              <Skeleton height={40} width={208} />
+            ) : (
+              <Select
+                id="month-selector"
+                name="month"
+                value={activeMonth}
+                onChange={(value) => setActiveMonth(value)}
+                options={getUniqueMonths().map((month) => ({
+                  value: month,
+                  label: formatMonth(month, "getUniqueMonths")
+                }))}
+                className="mb-0 w-52"
+                fullWidth={false}
+              />
+            )}
           </div>
-          
-          <Button
-            onClick={() => {
-              setEditingBudget(null);
-              setIsFormOpen(true);
-            }}
-            className="flex items-center"
-          >
-            <PlusIcon className="h-5 w-5 mr-2" />
-            Add Budget
-          </Button>
+
+          {isLoading ? (
+            <Skeleton height={40} width={140} />
+          ) : (
+            <Button
+              onClick={() => {
+                setEditingBudget(null);
+                setIsFormOpen(true);
+              }}
+              className="flex items-center"
+            >
+              <PlusIcon className="h-5 w-5 mr-2" />
+              Add Budget
+            </Button>
+          )}
         </div>
       </div>
 
       {/* Budget Summary */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <div className="flex flex-col">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Total Budget</h3>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
-              {formatCurrency(totalBudget)}
-            </p>
-            
-            <div className="mt-4">
-              <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-1">
-                <span>Spent: {formatCurrency(totalSpent)}</span>
-                <span>
-                  {getBudgetPercentage(totalBudget, totalSpent)}% of budget
-                </span>
-              </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                <div
-                  className={`h-2.5 rounded-full ${
-                    isOverBudget(totalBudget, totalSpent)
-                      ? 'bg-red-600 dark:bg-red-500'
-                      : getBudgetPercentage(totalBudget, totalSpent) > 80
-                      ? 'bg-yellow-400 dark:bg-yellow-500'
-                      : 'bg-green-600 dark:bg-green-500'
-                  }`}
-                  style={{ width: `${getBudgetPercentage(totalBudget, totalSpent)}%` }}
-                ></div>
-              </div>
-            </div>
-          </div>
-        </Card>
-        
-        <Card>
-          <div className="flex flex-col">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Remaining Budget</h3>
-            <p className={`text-3xl font-bold mt-2 ${
-              totalBudget - totalSpent > 0 
-                ? 'text-green-600 dark:text-green-400' 
-                : 'text-red-600 dark:text-red-400'
-            }`}>
-              {formatCurrency(totalBudget - totalSpent)}
-            </p>
-            
-            <div className="mt-4 flex items-center">
-              {isOverBudget(totalBudget, totalSpent) ? (
-                <div className="bg-red-100 dark:bg-red-900 p-3 rounded-md flex items-center text-red-800 dark:text-red-300 w-full">
-                  <ExclamationCircleIcon className="h-5 w-5 mr-2" />
-                  <span>You've exceeded your total budget for {formatMonth(activeMonth)}</span>
+        {isLoading ? (
+          <>
+            <SummarySkeleton />
+            <SummarySkeleton />
+          </>
+        ) : (
+          <>
+            <Card>
+              <div className="flex flex-col">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Total Budget</h3>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+                  {formatCurrency(totalBudget)}
+                </p>
+
+                <div className="mt-4">
+                  <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-1">
+                    <span>Spent: {formatCurrency(totalSpent)}</span>
+                    <span>
+                      {getBudgetPercentage(totalBudget, totalSpent)}% of budget
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                    <div
+                      className={`h-2.5 rounded-full ${isOverBudget(totalBudget, totalSpent)
+                        ? 'bg-red-600 dark:bg-red-500'
+                        : getBudgetPercentage(totalBudget, totalSpent) > 80
+                          ? 'bg-yellow-400 dark:bg-yellow-500'
+                          : 'bg-green-600 dark:bg-green-500'
+                        }`}
+                      style={{ width: `${getBudgetPercentage(totalBudget, totalSpent)}%` }}
+                    ></div>
+                  </div>
                 </div>
-              ) : (
-                <div className="bg-green-100 dark:bg-green-900 p-3 rounded-md flex items-center text-green-800 dark:text-green-300 w-full">
-                  <span>You're on track with your budget for {formatMonth(activeMonth)}</span>
+              </div>
+            </Card>
+
+            <Card>
+              <div className="flex flex-col">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Remaining Budget</h3>
+                <p className={`text-3xl font-bold mt-2 ${totalBudget - totalSpent > 0
+                  ? 'text-green-600 dark:text-green-400'
+                  : 'text-red-600 dark:text-red-400'
+                  }`}>
+                  {formatCurrency(totalBudget - totalSpent)}
+                </p>
+
+                <div className="mt-4 flex items-center">
+                  {isOverBudget(totalBudget, totalSpent) ? (
+                    <div className="bg-red-100 dark:bg-red-900 p-3 rounded-md flex items-center text-red-800 dark:text-red-300 w-full">
+                      <ExclamationCircleIcon className="h-5 w-5 mr-2" />
+                      <span>You've exceeded your total budget for {formatMonth(activeMonth, "activeMonth")}</span>
+                    </div>
+                  ) : (
+                    <div className="bg-green-100 dark:bg-green-900 p-3 rounded-md flex items-center text-green-800 dark:text-green-300 w-full">
+                      <span>You're on track with your budget for {formatMonth(activeMonth, "activeMonthh")}</span>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </div>
-        </Card>
+              </div>
+            </Card>
+          </>
+        )}
       </div>
 
       {/* Category Budgets */}
       <h2 className="text-xl font-medium text-gray-900 dark:text-white mt-8">Category Budgets</h2>
-      
-      {filteredBudgets.length > 0 ? (
+
+      {isLoading ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <BudgetCardSkeleton />
+          <BudgetCardSkeleton />
+          <BudgetCardSkeleton />
+          <BudgetCardSkeleton />
+        </div>
+      ) : filteredBudgets.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {filteredBudgets.map((budget) => (
             <Card key={budget.id}>
@@ -195,11 +435,11 @@ export default function BudgetPage() {
                       {getCategoryName(budget.categoryId)}
                     </h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {formatMonth(budget.month)}
+                      {formatMonth(budget.month, "formatMonth")}
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex space-x-2">
                   <Button
                     variant="secondary"
@@ -220,7 +460,7 @@ export default function BudgetPage() {
                   </Button>
                 </div>
               </div>
-              
+
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-gray-500 dark:text-gray-400">
@@ -230,26 +470,24 @@ export default function BudgetPage() {
                     Budget: {formatCurrency(budget.amount)}
                   </span>
                 </div>
-                
+
                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-2">
                   <div
-                    className={`h-2.5 rounded-full ${
-                      isOverBudget(budget.amount, budget.spent)
-                        ? 'bg-red-600 dark:bg-red-500'
-                        : getBudgetPercentage(budget.amount, budget.spent) > 80
+                    className={`h-2.5 rounded-full ${isOverBudget(budget.amount, budget.spent)
+                      ? 'bg-red-600 dark:bg-red-500'
+                      : getBudgetPercentage(budget.amount, budget.spent) > 80
                         ? 'bg-yellow-400 dark:bg-yellow-500'
                         : 'bg-green-600 dark:bg-green-500'
-                    }`}
+                      }`}
                     style={{ width: `${getBudgetPercentage(budget.amount, budget.spent)}%` }}
                   ></div>
                 </div>
-                
+
                 <div className="flex justify-between text-sm">
-                  <span className={`font-medium ${
-                    isOverBudget(budget.amount, budget.spent)
-                      ? 'text-red-600 dark:text-red-400'
-                      : 'text-green-600 dark:text-green-400'
-                  }`}>
+                  <span className={`font-medium ${isOverBudget(budget.amount, budget.spent)
+                    ? 'text-red-600 dark:text-red-400'
+                    : 'text-green-600 dark:text-green-400'
+                    }`}>
                     {isOverBudget(budget.amount, budget.spent)
                       ? `${formatCurrency(budget.spent - budget.amount)} over budget`
                       : `${formatCurrency(budget.amount - budget.spent)} remaining`}
@@ -258,7 +496,7 @@ export default function BudgetPage() {
                     {getBudgetPercentage(budget.amount, budget.spent)}% used
                   </span>
                 </div>
-                
+
                 {isOverBudget(budget.amount, budget.spent) && (
                   <div className="mt-3 text-sm text-red-600 dark:text-red-400 flex items-center">
                     <ExclamationCircleIcon className="h-4 w-4 mr-1" />
@@ -273,7 +511,7 @@ export default function BudgetPage() {
         <Card className="py-12">
           <div className="text-center">
             <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-white">
-              No budgets set for {formatMonth(activeMonth)}
+              No budgets set for {formatMonth(activeMonth, "no budgets")}
             </h3>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               Start planning your finances by setting up category budgets.
@@ -307,6 +545,7 @@ export default function BudgetPage() {
                   setIsFormOpen(false);
                   setEditingBudget(null);
                 }}
+                categories={categories}
                 initialData={editingBudget}
                 defaultMonth={activeMonth}
               />
@@ -316,4 +555,4 @@ export default function BudgetPage() {
       )}
     </div>
   );
-} 
+}

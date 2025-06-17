@@ -9,6 +9,7 @@ export interface Transaction {
   categoryId: string;
   accountId?: string;
   notes?: string;
+  userId: string;
 }
 
 export interface Category {
@@ -29,9 +30,10 @@ export interface Account {
 
 export interface Budget {
   id: string;
+  userId: string;
   categoryId: string;
   amount: number;
-  month: string; // YYYY-MM format
+  month: string; // YYYY-MM format 
   spent: number;
 }
 

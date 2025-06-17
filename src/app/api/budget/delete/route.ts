@@ -1,7 +1,12 @@
+import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
+    const token = await requireAuth(request);
+    if (token instanceof NextResponse) {
+        return token;
+    }
     const body = await request.json();
     const { id }: { id: string } = body;
 
@@ -10,10 +15,10 @@ export async function DELETE(request: Request) {
     }
 
     try {
-        const category = await prisma.category.delete({
+        const budget = await prisma.budget.delete({
             where: { id }
         });
-        return NextResponse.json(category, { status: 200 });
+        return NextResponse.json(budget, { status: 200 });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }

@@ -155,6 +155,26 @@ exports.Prisma.PasswordResetTokenScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.TransactionsScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  amount: 'amount',
+  date: 'date',
+  categoryId: 'categoryId',
+  accountId: 'accountId',
+  userId: 'userId',
+  notes: 'notes'
+};
+
+exports.Prisma.BudgetScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  categoryId: 'categoryId',
+  amount: 'amount',
+  month: 'month',
+  spent: 'spent'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -181,7 +201,9 @@ exports.Prisma.ModelName = {
   Category: 'Category',
   Account: 'Account',
   User: 'User',
-  PasswordResetToken: 'PasswordResetToken'
+  PasswordResetToken: 'PasswordResetToken',
+  Transactions: 'Transactions',
+  Budget: 'Budget'
 };
 
 /**
