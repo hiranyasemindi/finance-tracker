@@ -74,13 +74,25 @@ export default function BudgetPage() {
       );
       setBudgets(updatedBudgets);
     } else {
-      // Add new budget with generated ID
-      const newBudget = {
-        ...budget,
-        id: `budget-${Date.now()}`,
-        spent: 0, // Default spent to 0 for new budgets
-      };
-      setBudgets([...budgets, newBudget]);
+      fetch('/api/budget/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(budget)
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            console.error('Error adding budget:', data.error);
+          } else {
+            setBudgets([...budgets, data]);
+          }
+        })
+        .catch(error => {
+          console.error('Error adding budget:', error);
+        });
+
     }
     setIsFormOpen(false);
     setEditingBudget(null);
