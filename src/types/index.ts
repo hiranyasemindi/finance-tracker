@@ -9,6 +9,7 @@ export interface Transaction {
   categoryId: string;
   accountId?: string;
   notes?: string;
+  userId: string;
 }
 
 export interface Category {

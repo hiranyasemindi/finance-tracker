@@ -15,10 +15,10 @@ export async function DELETE(request: NextRequest) {
     }
 
     try {
-        const account = await prisma.account.delete({
+        const transaction = await prisma.transactions.delete({
             where: { id }
         });
-        return NextResponse.json(account, { status: 200 });
+        return NextResponse.json(transaction, { status: 200 });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }

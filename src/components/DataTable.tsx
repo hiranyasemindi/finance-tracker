@@ -80,7 +80,7 @@ export default function DataTable<T>({
           </tr>
         </thead>
         <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-          {sortedData.map((item) => (
+          {sortedData?.map((item) => (
             <tr key={keyExtractor(item)}>
               {columns.map((column) => (
                 <td 
