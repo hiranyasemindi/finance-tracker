@@ -98,11 +98,52 @@ export default function BudgetPage() {
   // Handle new budget
   const handleAddBudget = (budget: any) => {
     if (editingBudget) {
-      // Update existing budget
-      const updatedBudgets = budgets.map(b =>
-        b.id === editingBudget.id ? { ...budget, id: editingBudget.id } : b
-      );
-      setBudgets(updatedBudgets);
+      fetch('/api/budget/edit', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(budget)
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            showToast.error(data.error, {
+              duration: 3000,
+              progress: true,
+              position: "top-right",
+              transition: "bounceIn",
+              icon: '',
+              sound: true,
+            })
+            return
+          }
+          const updatedBudgets = budgets.map(b =>
+            b.id === editingBudget.id ? { ...budget, id: editingBudget.id } : b
+          );
+          setBudgets(updatedBudgets);
+          showToast.success(data.message, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+          setIsFormOpen(false);
+          setEditingBudget(null);
+        })
+        .catch(error => {
+          console.error('Error updating budget:', error);
+          showToast.error('Error updating budget', {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          })
+        });
     } else {
       fetch('/api/budget/add', {
         method: 'POST',
