@@ -10,7 +10,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, name, balance, type }: { name: string; balance: number; type: AccountType; id: number; } = body;
+    const { id, name, balance, type }: { name: string; balance: number; type: AccountType; id: string; } = body;
     if (!id || !name || !balance || !type) {
         return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
