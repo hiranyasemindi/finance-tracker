@@ -16,11 +16,9 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
-        // 1. Determine start and end of the specified month
         const { start, end } = getStartAndEndOfMonth(month);
         console.log(start, end);
 
-        // 2. Retrieve transactions for this user, this category, within this range
         const transactions = await prisma.transactions.findMany({
             where: {
                 userId,
@@ -29,11 +27,16 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        // 3. If transactions exist, sum their amounts
         const totalSpent = transactions.reduce((acc, t) => acc + t.amount, 0);
         console.log(totalSpent);
 
-        // 4. Prepare the data to create the budget
+        const alreadyAvailable = await prisma.budget.findFirst({
+            where: { userId, categoryId, month }
+        });
+        if (alreadyAvailable) {
+            return NextResponse.json({ error: "Budget already available for this month" }, { status: 400 });
+        }
+
         const budget = await prisma.budget.create({
             data: {
                 categoryId,

@@ -86,9 +86,26 @@ export default function BudgetPage() {
         .then(response => response.json())
         .then(data => {
           if (data.error) {
-            console.error('Error adding budget:', data.error);
+            showToast.error(data.error, {
+              duration: 3000,
+              progress: true,
+              position: "top-right",
+              transition: "bounceIn",
+              icon: '',
+              sound: true,
+            })
           } else {
             setBudgets([...budgets, data.budget]);
+            showToast.success('Budget added successfully', {
+              duration: 3000,
+              progress: true,
+              position: "top-right",
+              transition: "bounceIn",
+              icon: '',
+              sound: true,
+            })
+            setIsFormOpen(false);
+            setEditingBudget(null);
           }
         })
         .catch(error => {
@@ -96,8 +113,6 @@ export default function BudgetPage() {
         });
 
     }
-    setIsFormOpen(false);
-    setEditingBudget(null);
   };
 
   // Handle delete budget
