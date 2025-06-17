@@ -72,10 +72,10 @@ export const mockTransactions = generateRandomTransactions(100);
 
 // Mock Budgets
 export const mockBudgets: Budget[] = [
-  { id: '1', categoryId: '3', amount: 500, month: '2023-11', spent: 420 },
-  { id: '2', categoryId: '4', amount: 200, month: '2023-11', spent: 180 },
+  { id: '1', categoryId: '3', amount: 500, month: '2023-10', spent: 420 },
+  { id: '2', categoryId: '4', amount: 200, month: '2023-10', spent: 180 },
   { id: '3', categoryId: '5', amount: 1200, month: '2023-11', spent: 1200 },
-  { id: '4', categoryId: '6', amount: 300, month: '2023-11', spent: 350 },
+  { id: '4', categoryId: '6', amount: 300, month: '2023-09', spent: 350 },
   { id: '5', categoryId: '7', amount: 400, month: '2023-11', spent: 225 },
   { id: '6', categoryId: '8', amount: 250, month: '2023-11', spent: 240 },
 ];

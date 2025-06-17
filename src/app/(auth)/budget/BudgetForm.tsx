@@ -3,20 +3,22 @@
 import { useState } from 'react';
 import Button from '@/components/Button';
 import { Input, Select, FormGroup } from '@/components/form';
-import { mockCategories } from '@/data/mockData';
-import { Budget } from '@/types';
+import { Budget, Category } from '@/types';
 
 interface BudgetFormProps {
   onSubmit: (data: Partial<Budget>) => void;
   onCancel: () => void;
   initialData?: Budget | null;
   defaultMonth?: string;
+  categories?: Category[],
+
 }
 
 export default function BudgetForm({
   onSubmit,
   onCancel,
   initialData,
+  categories,
   defaultMonth = new Date().toISOString().slice(0, 7) // Current month in YYYY-MM format
 }: BudgetFormProps) {
   const [formData, setFormData] = useState<Partial<Budget>>({
@@ -28,9 +30,9 @@ export default function BudgetForm({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
+
   // Get expense categories only (budgets are for expenses)
-  const expenseCategories = mockCategories.filter(c => c.type === 'expense');
+  const expenseCategories = categories?.filter(c => c.type === 'expense');
 
   const handleChange = (name: string, value: any) => {
     // Handle numeric fields
@@ -52,15 +54,15 @@ export default function BudgetForm({
   const getMonthOptions = () => {
     const options = [];
     const today = new Date();
-    
+
     for (let i = 0; i < 12; i++) {
       const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
       const monthStr = date.toISOString().slice(0, 7); // YYYY-MM format
       const monthDisplay = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-      
+
       options.push({ value: monthStr, label: monthDisplay });
     }
-    
+
     return options;
   };
 
@@ -85,7 +87,7 @@ export default function BudgetForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (validateForm()) {
       onSubmit(formData);
     }
@@ -94,7 +96,7 @@ export default function BudgetForm({
   // Prepare category options
   const categoryOptions = [
     { value: '', label: 'Select a category' },
-    ...expenseCategories.map(category => ({
+    ...(expenseCategories ?? []).map(category => ({
       value: String(category.id),
       label: category.name
     }))
