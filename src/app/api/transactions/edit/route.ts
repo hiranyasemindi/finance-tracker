@@ -16,39 +16,47 @@ export async function PUT(request: NextRequest) {
     const userId = (token as { id: string }).id;
 
     try {
-        const existingTransaction = await prisma.transactions.findUnique({ where: { id } });
-        if (!existingTransaction) {
+        const existing = await prisma.transactions.findUnique({ where: { id } });
+        if (!existing) {
             return NextResponse.json({ error: "Transaction not found" }, { status: 404 });
         }
 
-        // 2️⃣ find old and new budgets
-        const oldMonth = existingTransaction.date.toISOString().slice(0, 7);
+        const oldMonth = existing.date.toISOString().slice(0, 7);
         const newMonth = transactionDate.toISOString().slice(0, 7);
         const oldBudget = await prisma.budget.findFirst({
-            where: { userId, categoryId: existingTransaction.categoryId, month: oldMonth }
+            where: { userId, categoryId: existing.categoryId, month: oldMonth }
         });
         const newBudget = await prisma.budget.findFirst({
             where: { userId, categoryId, month: newMonth }
         });
 
-        await prisma.$transaction([
-            ...(oldBudget ? [prisma.budget.update({
+
+        if (existing.categoryId === categoryId && oldMonth === newMonth && oldBudget) {
+            const diff = amount - existing.amount;
+            await prisma.budget.update({
                 where: { id: oldBudget.id },
-                data: { spent: Math.max(0, oldBudget.spent - existingTransaction.amount) }
-            })] : [])
-            ,
-            // Update transaction
-            prisma.transactions.update({
-                where: { id },
-                data: { type, amount, date: transactionDate, categoryId, accountId, notes }
-            })
-            ,
-            // Add to new
-            ...(newBudget ? [prisma.budget.update({
-                where: { id: newBudget.id },
-                data: { spent: newBudget.spent + amount }
-            })] : [])
-        ]);
+                data: { spent: oldBudget.spent + diff }
+            });
+
+        } else {
+            if (oldBudget) {
+                await prisma.budget.update({
+                    where: { id: oldBudget.id },
+                    data: { spent: Math.max(0, oldBudget.spent - existing.amount) }
+                });
+            }
+            if (newBudget) {
+                await prisma.budget.update({
+                    where: { id: newBudget.id },
+                    data: { spent: newBudget.spent + amount }
+                });
+            }
+        }
+
+        await prisma.transactions.update({
+            where: { id },
+            data: { type, amount, date: transactionDate, categoryId, accountId, notes }
+        });
 
         return NextResponse.json({ message: "Transaction updated successfully" }, { status: 200 });
 
@@ -57,3 +65,4 @@ export async function PUT(request: NextRequest) {
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
     }
 }
+

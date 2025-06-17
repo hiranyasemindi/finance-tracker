@@ -46,6 +46,34 @@ export default function BudgetPage() {
       });
   }, [])
 
+  useEffect(() => {
+    fetch('/api/budget', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          showToast.error(`Error fetching categories`, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+          console.error('Error fetching categories:', data.error);
+          return;
+        }
+        setBudgets(data);
+      })
+      .catch(error => {
+        console.error('Error fetching categories:', error);
+      });
+  }, [])
+
   // Filter budgets by active month
   const filteredBudgets = budgets.filter(budget => budget.month === activeMonth);
 
