@@ -306,7 +306,7 @@ export default function BudgetPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Budget Planning</h1>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center justify-center gap-4">
           {/* Month selector */}
           <div className="flex items-center h-10">
             {isLoading ? (
