@@ -30,6 +30,7 @@ export interface Account {
 
 export interface Budget {
   id: string;
+  userId: string;
   categoryId: string;
   amount: number;
   month: string; // YYYY-MM format 

@@ -53,16 +53,20 @@ export default function BudgetForm({
   // Generate the last 12 months options for the month selector
   const getMonthOptions = () => {
     const options = [];
-    const today = new Date();
 
     for (let i = 0; i < 12; i++) {
-      const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
-      const monthStr = date.toISOString().slice(0, 7); // YYYY-MM format
-      const monthDisplay = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      // start from today's first of the month
+      const date = new Date();
+      date.setDate(1);
+      date.setMonth(date.getMonth() - i);
 
-      options.push({ value: monthStr, label: monthDisplay });
+      const monthStr = date.toISOString().slice(0, 7);
+      const label = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+      options.push({ value: monthStr, label });
     }
 
+    console.log(options);
     return options;
   };
 

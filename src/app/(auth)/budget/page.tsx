@@ -3,19 +3,20 @@
 import { useEffect, useState } from 'react';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
-import { mockBudgets, mockCategories } from '@/data/mockData';
-import { Category, formatCurrency } from '@/types';
+import { Budget, Category, formatCurrency } from '@/types';
 import { PlusIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import BudgetForm from './BudgetForm';
 import { Select } from '@/components/form';
 import { showToast } from 'nextjs-toast-notify';
 
 export default function BudgetPage() {
-  const [budgets, setBudgets] = useState(mockBudgets);
+  const [budgets, setBudgets] = useState<Budget[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState<any>(null);
-  const [activeMonth, setActiveMonth] = useState<string>('2023-11'); // Default to November 2023
+  const [activeMonth, setActiveMonth] = useState<string>(
+    new Date().toISOString().slice(0, 7) // This gives 'YYYY-MM' format
+  );// Default to November 2023
 
   useEffect(() => {
     fetch('/api/categories', {
@@ -59,8 +60,9 @@ export default function BudgetPage() {
   };
 
   // Format month for display (YYYY-MM to Month YYYY)
-  const formatMonth = (monthStr: string) => {
-    const [year, month] = monthStr.split('-');
+  const formatMonth = (monthStr: string, func: string) => {
+    console.log(monthStr, func);
+    const [year, month] = monthStr?.split('-');
     const date = new Date(parseInt(year), parseInt(month) - 1);
     return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   };
@@ -86,7 +88,7 @@ export default function BudgetPage() {
           if (data.error) {
             console.error('Error adding budget:', data.error);
           } else {
-            setBudgets([...budgets, data]);
+            setBudgets([...budgets, data.budget]);
           }
         })
         .catch(error => {
@@ -140,7 +142,7 @@ export default function BudgetPage() {
               onChange={(value) => setActiveMonth(value)}
               options={getUniqueMonths().map((month) => ({
                 value: month,
-                label: formatMonth(month)
+                label: formatMonth(month, "getUniqueMonths")
               }))}
               className="mb-0 w-52"
               fullWidth={false}
@@ -205,11 +207,11 @@ export default function BudgetPage() {
               {isOverBudget(totalBudget, totalSpent) ? (
                 <div className="bg-red-100 dark:bg-red-900 p-3 rounded-md flex items-center text-red-800 dark:text-red-300 w-full">
                   <ExclamationCircleIcon className="h-5 w-5 mr-2" />
-                  <span>You've exceeded your total budget for {formatMonth(activeMonth)}</span>
+                  <span>You've exceeded your total budget for {formatMonth(activeMonth, "activeMonth")}</span>
                 </div>
               ) : (
                 <div className="bg-green-100 dark:bg-green-900 p-3 rounded-md flex items-center text-green-800 dark:text-green-300 w-full">
-                  <span>You're on track with your budget for {formatMonth(activeMonth)}</span>
+                  <span>You're on track with your budget for {formatMonth(activeMonth, "activeMonthh")}</span>
                 </div>
               )}
             </div>
@@ -235,7 +237,7 @@ export default function BudgetPage() {
                       {getCategoryName(budget.categoryId)}
                     </h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {formatMonth(budget.month)}
+                      {formatMonth(budget.month, "formatMonth")}
                     </p>
                   </div>
                 </div>
@@ -311,7 +313,7 @@ export default function BudgetPage() {
         <Card className="py-12">
           <div className="text-center">
             <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-white">
-              No budgets set for {formatMonth(activeMonth)}
+              No budgets set for {formatMonth(activeMonth, "no budgets")}
             </h3>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               Start planning your finances by setting up category budgets.
