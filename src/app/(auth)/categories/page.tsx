@@ -17,8 +17,6 @@ export default function CategoriesPage() {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [loading, setLoading] = useState(true);
 
-
-
   const fetchCategories = async () => {
     const userId = localStorage.getItem('userId')
     await fetch('/api/categories', {
@@ -233,73 +231,81 @@ export default function CategoriesPage() {
 
       {/* Categories Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {loading && (
+        {loading ? (
           Array(6).fill(0).map((_, i) => (
-            <div key={i} className="p-4 border bg-white rounded shadow">
-              <Skeleton height={32} width={32} circle />
-              <Skeleton height={20} width="60%" />
-              <Skeleton height={16} width="80%" />
-            </div>
+            <Card key={i} className="flex flex-col p-4">
+              <div className="flex items-center mb-4">
+                <Skeleton circle width={32} height={32} className="mr-3" />
+                <Skeleton width={120} height={24} className="flex-1" />
+                <div className="flex space-x-2">
+                  <Skeleton circle width={20} height={20} />
+                  <Skeleton circle width={20} height={20} />
+                </div>
+              </div>
+              <Skeleton width={100} height={16} />
+            </Card>
           ))
-        )}
+        ) : (
+          <>
+            {filteredCategories.map(category => (
+              <Card key={category.id} className="flex flex-col">
+                <div className="flex items-center mb-4">
+                  <div
+                    className="w-8 h-8 rounded-full mr-3"
+                    style={{ backgroundColor: category.color }}
+                  />
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white flex-1">
+                    {category.name}
+                  </h3>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => {
+                        setEditingCategory(category);
+                        setIsFormOpen(true);
+                      }}
+                      className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                    >
+                      <PencilIcon className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteCategory(category.id)}
+                      className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                    >
+                      <TrashIcon className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  {category.type === 'income' ? 'Income' : 'Expense'} Category
+                </div>
+              </Card>
+            ))}
 
-        {filteredCategories.map(category => (
-          <Card key={category.id} className="flex flex-col">
-            <div className="flex items-center mb-4">
-              <div
-                className="w-8 h-8 rounded-full mr-3"
-                style={{ backgroundColor: category.color }}
-              />
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white flex-1">
-                {category.name}
-              </h3>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => {
-                    setEditingCategory(category);
-                    setIsFormOpen(true);
-                  }}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                >
-                  <PencilIcon className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={() => handleDeleteCategory(category.id)}
-                  className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                >
-                  <TrashIcon className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              {category.type === 'income' ? 'Income' : 'Expense'} Category
-            </div>
-          </Card>
-        ))}
-
-        {/* Empty state */}
-        {!loading && filteredCategories.length === 0 && (
-          <Card className="col-span-full py-12">
-            <div className="text-center">
-              <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-white">
-                No {activeTab} categories
-              </h3>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                Get started by creating a new {activeTab} category.
-              </p>
-              <div className="mt-6">
-                <Button
-                  onClick={() => {
-                    setEditingCategory(null);
-                    setIsFormOpen(true);
-                  }}
-                >
-                  <PlusIcon className="h-5 w-5 mr-2 -ml-1" />
-                  Add Category
-                </Button>
-              </div>
-            </div>
-          </Card>
+            {/* Empty state */}
+            {filteredCategories.length === 0 && (
+              <Card className="col-span-full py-12">
+                <div className="text-center">
+                  <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-white">
+                    No {activeTab} categories
+                  </h3>
+                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    Get started by creating a new {activeTab} category.
+                  </p>
+                  <div className="mt-6">
+                    <Button
+                      onClick={() => {
+                        setEditingCategory(null);
+                        setIsFormOpen(true);
+                      }}
+                    >
+                      <PlusIcon className="h-5 w-5 mr-2 -ml-1" />
+                      Add Category
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            )}
+          </>
         )}
       </div>
 
@@ -326,4 +332,4 @@ export default function CategoriesPage() {
       )}
     </div>
   );
-} 
+}
