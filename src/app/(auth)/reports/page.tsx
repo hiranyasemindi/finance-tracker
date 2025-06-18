@@ -10,6 +10,8 @@ import { ArrowDownTrayIcon, DocumentTextIcon, DocumentChartBarIcon } from '@hero
 import { showToast } from 'nextjs-toast-notify';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { jsPDF } from 'jspdf';
+import * as htmlToImage from 'html-to-image';
 
 export default function ReportsPage() {
   const [monthlyReports, setMonthlyReports] = useState<any>([]);
@@ -180,14 +182,80 @@ export default function ReportsPage() {
     ],
   };
 
-  const downloadCSVReport = () => {
-    console.log('Downloading CSV report for', selectedMonth);
-    alert('CSV Report downloaded!');
-  };
+  const downloadPDFReport = async () => {
+    try {
+      showToast.info('Generating PDF report...', {
+        duration: 2000,
+        progress: true,
+        position: "top-right",
+        transition: "bounceIn",
+        icon: '',
+        sound: true,
+      });
 
-  const downloadPDFReport = () => {
-    console.log('Downloading PDF report for', selectedMonth);
-    alert('PDF Report downloaded!');
+      const pdf = new jsPDF('p', 'pt', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const margin = 20;
+      const contentWidth = pageWidth - margin * 2;
+
+      pdf.setFontSize(20);
+      pdf.setTextColor(40);
+      pdf.text(`Financial Report - ${selectedMonth}`, pageWidth / 2, 40, { align: 'center' });
+
+      const addSection = async (selector: string, yPosition: number) => {
+        const element = document.querySelector(selector) as HTMLElement;
+        if (!element) return yPosition;
+
+        const dataUrl = await htmlToImage.toPng(element, {
+          backgroundColor: '#ffffff',
+          quality: 1,
+          pixelRatio: 2,
+        });
+
+        const imgProps = pdf.getImageProperties(dataUrl);
+        const pdfWidth = contentWidth;
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+        if (yPosition + pdfHeight > pdf.internal.pageSize.getHeight() - margin) {
+          pdf.addPage();
+          yPosition = margin;
+        }
+
+        pdf.addImage(dataUrl, 'PNG', margin, yPosition, pdfWidth, pdfHeight, undefined, 'FAST');
+        return yPosition + pdfHeight + margin;
+      };
+
+      let currentY = 60;
+
+      currentY = await addSection('.grid.grid-cols-1.md\\:grid-cols-3', currentY);
+
+      currentY = await addSection('div.space-y-6 > div:nth-child(3)', currentY);
+
+      currentY = await addSection('.grid.grid-cols-1.lg\\:grid-cols-2', currentY);
+
+      currentY = await addSection('div.space-y-6 > div:last-child', currentY);
+
+      pdf.save(`Financial_Report_${selectedMonth.replace(' ', '_')}.pdf`);
+
+      showToast.success('PDF report generated successfully!', {
+        duration: 3000,
+        progress: true,
+        position: "top-right",
+        transition: "bounceIn",
+        icon: '',
+        sound: true,
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      showToast.error('Failed to generate PDF report', {
+        duration: 3000,
+        progress: true,
+        position: "top-right",
+        transition: "bounceIn",
+        icon: '',
+        sound: true,
+      });
+    }
   };
 
   if (isLoading) {
