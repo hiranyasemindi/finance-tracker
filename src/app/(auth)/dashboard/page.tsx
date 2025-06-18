@@ -478,71 +478,7 @@ export default function Dashboard() {
         </div>
       </Card>
       
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-white dark:bg-gray-800">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Quick Actions</h3>
-          </div>
-          <div className="mt-4 grid grid-cols-2 gap-4">
-            <button className="flex flex-col items-center justify-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
-              <ArrowUpIcon className="h-6 w-6 text-green-600 dark:text-green-400 mb-2" />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Add Income</span>
-            </button>
-            <button className="flex flex-col items-center justify-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
-              <ArrowDownIcon className="h-6 w-6 text-red-600 dark:text-red-400 mb-2" />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Add Expense</span>
-            </button>
-            <button className="flex flex-col items-center justify-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
-              <CreditCardIcon className="h-6 w-6 text-blue-600 dark:text-blue-400 mb-2" />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Add Account</span>
-            </button>
-            <button className="flex flex-col items-center justify-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
-              <WalletIcon className="h-6 w-6 text-purple-600 dark:text-purple-400 mb-2" />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Add Budget</span>
-            </button>
-          </div>
-        </Card>
-        
-        {/* Savings Goals */}
-        <Card className="bg-white dark:bg-gray-800 md:col-span-2">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Savings Goals</h3>
-            <button className="text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300">
-              Add Goal
-            </button>
-          </div>
-          <div className="mt-4 space-y-4">
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Vacation</span>
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">$2,500 / $5,000</span>
-              </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                <div className="bg-green-600 dark:bg-green-500 h-2.5 rounded-full" style={{ width: '50%' }}></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">New Car</span>
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">$15,000 / $30,000</span>
-              </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                <div className="bg-blue-600 dark:bg-blue-500 h-2.5 rounded-full" style={{ width: '50%' }}></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Emergency Fund</span>
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">$8,000 / $10,000</span>
-              </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                <div className="bg-purple-600 dark:bg-purple-500 h-2.5 rounded-full" style={{ width: '80%' }}></div>
-              </div>
-            </div>
-          </div>
-        </Card>
-      </div>
+     
     </div>
   );
 } 
