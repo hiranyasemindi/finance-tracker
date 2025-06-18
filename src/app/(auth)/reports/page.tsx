@@ -1,21 +1,79 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
 import { Select } from '@/components/form';
 import ChartComponent from '@/components/ChartComponent';
-import { mockMonthlyReports, mockCategories, generateMonthlyData, generateCategoryBreakdown } from '@/data/mockData';
-import { formatCurrency } from '@/types';
+import { Category, formatCurrency } from '@/types';
 import { ArrowDownTrayIcon, DocumentTextIcon, DocumentChartBarIcon } from '@heroicons/react/24/outline';
+import { showToast } from 'nextjs-toast-notify';
 
 export default function ReportsPage() {
-  const [selectedMonth, setSelectedMonth] = useState<string>(mockMonthlyReports[0].month);
+  const [monthlyReports, setMonthlyReports] = useState<any>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedMonth, setSelectedMonth] = useState<string>(monthlyReports[0]?.month);
   const [chartType, setChartType] = useState<'bar' | 'line'>('bar');
-  
+
+  useEffect(() => {
+    fetch("/api/reports/monthly-reports", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        setMonthlyReports(data);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  }, [])
+
+  useEffect(() => {
+    fetch('/api/categories', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          showToast.error(`Error fetching categories`, {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: '',
+            sound: true,
+          });
+          console.error('Error fetching categories:', data.error);
+        } else {
+          setCategories(data);
+        }
+      }
+      )
+      .catch(error => {
+        showToast.error(`Error fetching categories`, {
+          duration: 3000,
+          progress: true,
+          position: "top-right",
+          transition: "bounceIn",
+          icon: '',
+          sound: true,
+        });
+        console.error('Error fetching categories:', error);
+      })
+      .finally(() => {
+      });
+  }, [])
+
   // Get the selected month's report
-  const selectedReport = mockMonthlyReports.find(report => report.month === selectedMonth) || mockMonthlyReports[0];
-  
+  const selectedReport = monthlyReports?.find((report: any) => report.month === selectedMonth) || monthlyReports[0];
+
   // Format the month for display (YYYY-MM to Month YYYY)
   const formatMonthDisplay = (monthStr: string) => {
     const [year, month] = monthStr.split('-');
@@ -24,41 +82,65 @@ export default function ReportsPage() {
   };
 
   // Prepare month options for select
-  const monthOptions = mockMonthlyReports.map(report => ({
+  const monthOptions = monthlyReports.map((report: any) => ({
     value: report.month,
     label: formatMonthDisplay(report.month)
   }));
 
+  const generateMonthlyData = () => {
+    const sorted = [...monthlyReports].sort((a, b) => {
+      const dateA = new Date(a.month.trim());
+      const dateB = new Date(b.month.trim());
+      return dateA.getTime() - dateB.getTime();
+    });
+
+    const labels = sorted.map(report => {
+      const [month, year] = report.month.trim().split(/\s+/);
+      return `${month.slice(0, 3)} ${year}`;
+    });
+
+    const incomeData = sorted.map(report => report.totalIncome || 0);
+    const expenseData = sorted.map(report => report.totalExpense || 0);
+    const balanceData = sorted.map(report => (report.totalIncome || 0) - (report.totalExpense || 0));
+
+    return {
+      labels,
+      incomeData,
+      expenseData,
+      balanceData,
+    };
+  };
+
   // Monthly data for charts
   const monthlyData = generateMonthlyData();
-  
+
   // Expense breakdown for the selected month
-  const expenseCategories = selectedReport.categories.filter(c => c.type === 'expense');
-  const incomeCategories = selectedReport.categories.filter(c => c.type === 'income');
-  
+  const expenseCategories = selectedReport?.categories.filter((c: any) => c.type === 'expense');
+  const incomeCategories = selectedReport?.categories.filter((c: any) => c.type === 'income');
+
   // Pie chart data for expense breakdown
   const expensePieData = {
-    labels: expenseCategories.map(c => c.name),
+    labels: expenseCategories?.map((c: any) => c.name),
     datasets: [
       {
-        data: expenseCategories.map(c => c.amount),
-        backgroundColor: expenseCategories.map(c => {
-          const category = mockCategories.find(cat => cat.id === c.id);
+        data: expenseCategories?.map((c: any) => c.amount),
+        backgroundColor: expenseCategories?.map((c: any) => {
+          const category = categories?.find(cat => cat.id === c.id);
           return category ? category.color : '#gray';
         }),
         borderWidth: 1,
       },
     ],
   };
-  
+
   // Income pie chart data
   const incomePieData = {
-    labels: incomeCategories.map(c => c.name),
+    labels: incomeCategories?.map((c: any) => c.name),
     datasets: [
       {
-        data: incomeCategories.map(c => c.amount),
-        backgroundColor: incomeCategories.map(c => {
-          const category = mockCategories.find(cat => cat.id === c.id);
+        data: incomeCategories?.map((c: any) => c.amount),
+        backgroundColor: incomeCategories?.map((c: any) => {
+          const category = categories?.find(cat => cat.id === c.id);
           return category ? category.color : '#gray';
         }),
         borderWidth: 1,
@@ -115,7 +197,7 @@ export default function ReportsPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Financial Reports</h1>
-        
+
         <div className="flex items-center space-x-4">
           {/* Month selector */}
           <div className="flex items-center">
@@ -159,22 +241,22 @@ export default function ReportsPage() {
         <Card className="bg-gradient-to-r from-green-500 to-emerald-500 text-white">
           <div className="flex flex-col items-center">
             <h3 className="text-lg font-medium">Total Income</h3>
-            <p className="text-2xl font-bold">{formatCurrency(selectedReport.totalIncome)}</p>
+            <p className="text-2xl font-bold">{formatCurrency(selectedReport?.totalIncome)}</p>
           </div>
         </Card>
-        
+
         <Card className="bg-gradient-to-r from-red-500 to-orange-500 text-white">
           <div className="flex flex-col items-center">
             <h3 className="text-lg font-medium">Total Expenses</h3>
-            <p className="text-2xl font-bold">{formatCurrency(selectedReport.totalExpense)}</p>
+            <p className="text-2xl font-bold">{formatCurrency(selectedReport?.totalExpense)}</p>
           </div>
         </Card>
-        
+
         <Card className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
           <div className="flex flex-col items-center">
             <h3 className="text-lg font-medium">Net Savings</h3>
             <p className="text-2xl font-bold">
-              {formatCurrency(selectedReport.totalIncome - selectedReport.totalExpense)}
+              {formatCurrency(selectedReport?.totalIncome - selectedReport?.totalExpense)}
             </p>
           </div>
         </Card>
@@ -185,30 +267,28 @@ export default function ReportsPage() {
         <div className="mb-4 flex justify-end">
           <div className="flex space-x-2 border border-gray-200 dark:border-gray-700 rounded-md p-1">
             <button
-              className={`px-3 py-1 rounded-md text-sm ${
-                chartType === 'bar'
-                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-                  : 'text-gray-600 dark:text-gray-300'
-              }`}
+              className={`px-3 py-1 rounded-md text-sm ${chartType === 'bar'
+                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                : 'text-gray-600 dark:text-gray-300'
+                }`}
               onClick={() => setChartType('bar')}
             >
               Bar
             </button>
             <button
-              className={`px-3 py-1 rounded-md text-sm ${
-                chartType === 'line'
-                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-                  : 'text-gray-600 dark:text-gray-300'
-              }`}
+              className={`px-3 py-1 rounded-md text-sm ${chartType === 'line'
+                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                : 'text-gray-600 dark:text-gray-300'
+                }`}
               onClick={() => setChartType('line')}
             >
               Line
             </button>
           </div>
         </div>
-        <ChartComponent 
-          type={chartType} 
-          data={monthlyChartData} 
+        <ChartComponent
+          type={chartType}
+          data={monthlyChartData}
           height={300}
         />
       </Card>
@@ -216,11 +296,11 @@ export default function ReportsPage() {
       {/* Expense & Income Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card title="Expense Breakdown">
-          {expenseCategories.length > 0 ? (
+          {expenseCategories?.length > 0 ? (
             <div className="h-64">
-              <ChartComponent 
-                type="pie" 
-                data={expensePieData} 
+              <ChartComponent
+                type="pie"
+                data={expensePieData}
               />
             </div>
           ) : (
@@ -229,13 +309,13 @@ export default function ReportsPage() {
             </div>
           )}
         </Card>
-        
+
         <Card title="Income Breakdown">
-          {incomeCategories.length > 0 ? (
+          {incomeCategories?.length > 0 ? (
             <div className="h-64">
-              <ChartComponent 
-                type="pie" 
-                data={incomePieData} 
+              <ChartComponent
+                type="pie"
+                data={incomePieData}
               />
             </div>
           ) : (
@@ -267,18 +347,18 @@ export default function ReportsPage() {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-              {selectedReport.categories.map((category) => {
-                const categoryInfo = mockCategories.find(c => c.id === category.id);
-                const totalForType = category.type === 'income' ? 
+              {selectedReport?.categories.map((category: any) => {
+                const categoryInfo = categories?.find(c => c.id === category.id);
+                const totalForType = category.type === 'income' ?
                   selectedReport.totalIncome : selectedReport.totalExpense;
-                const percentage = totalForType > 0 ? 
+                const percentage = totalForType > 0 ?
                   ((category.amount / totalForType) * 100).toFixed(1) : '0';
-                
+
                 return (
                   <tr key={category.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div 
+                        <div
                           className="w-4 h-4 rounded-full mr-2"
                           style={{ backgroundColor: categoryInfo?.color || '#gray' }}
                         />
@@ -288,11 +368,10 @@ export default function ReportsPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        category.type === 'income' 
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' 
-                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
-                      }`}>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${category.type === 'income'
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                        : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+                        }`}>
                         {category.type === 'income' ? 'Income' : 'Expense'}
                       </span>
                     </td>
@@ -312,7 +391,7 @@ export default function ReportsPage() {
                   Total
                 </th>
                 <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                  {formatCurrency(selectedReport.totalIncome - selectedReport.totalExpense)}
+                  {formatCurrency(selectedReport?.totalIncome - selectedReport?.totalExpense)}
                 </td>
                 <td></td>
               </tr>
