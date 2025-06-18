@@ -8,40 +8,41 @@ import ChartComponent from '@/components/ChartComponent';
 import { Category, formatCurrency } from '@/types';
 import { ArrowDownTrayIcon, DocumentTextIcon, DocumentChartBarIcon } from '@heroicons/react/24/outline';
 import { showToast } from 'nextjs-toast-notify';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 export default function ReportsPage() {
   const [monthlyReports, setMonthlyReports] = useState<any>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedMonth, setSelectedMonth] = useState<string>(monthlyReports[0]?.month);
+  const [selectedMonth, setSelectedMonth] = useState<string>('');
   const [chartType, setChartType] = useState<'bar' | 'line'>('bar');
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    fetch("/api/reports/monthly-reports", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log(data);
-        setMonthlyReports(data);
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
-  }, [])
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
 
-  useEffect(() => {
-    fetch('/api/categories', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.error) {
+        const reportsResponse = await fetch("/api/reports/monthly-reports", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const reportsData = await reportsResponse.json();
+        setMonthlyReports(reportsData);
+        if (reportsData.length > 0) {
+          setSelectedMonth(reportsData[0].month);
+        }
+
+        const categoriesResponse = await fetch('/api/categories', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        const categoriesData = await categoriesResponse.json();
+        if (categoriesData.error) {
           showToast.error(`Error fetching categories`, {
             duration: 3000,
             progress: true,
@@ -50,14 +51,12 @@ export default function ReportsPage() {
             icon: '',
             sound: true,
           });
-          console.error('Error fetching categories:', data.error);
+          console.error('Error fetching categories:', categoriesData.error);
         } else {
-          setCategories(data);
+          setCategories(categoriesData);
         }
-      }
-      )
-      .catch(error => {
-        showToast.error(`Error fetching categories`, {
+      } catch (error) {
+        showToast.error(`Error fetching data`, {
           duration: 3000,
           progress: true,
           position: "top-right",
@@ -65,38 +64,40 @@ export default function ReportsPage() {
           icon: '',
           sound: true,
         });
-        console.error('Error fetching categories:', error);
-      })
-      .finally(() => {
-      });
-  }, [])
+        console.error('Error:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Get the selected month's report
   const selectedReport = monthlyReports?.find((report: any) => report.month === selectedMonth) || monthlyReports[0];
 
   // Format the month for display (YYYY-MM to Month YYYY)
   const formatMonthDisplay = (monthStr: string) => {
-    const [year, month] = monthStr.split('-');
-    const date = new Date(parseInt(year), parseInt(month) - 1);
-    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    if (!monthStr) return '';
+    return monthStr;
   };
 
   // Prepare month options for select
   const monthOptions = monthlyReports.map((report: any) => ({
     value: report.month,
-    label: formatMonthDisplay(report.month)
+    label: report.month
   }));
 
   const generateMonthlyData = () => {
     const sorted = [...monthlyReports].sort((a, b) => {
-      const dateA = new Date(a.month.trim());
-      const dateB = new Date(b.month.trim());
+      const dateA = new Date(a.month);
+      const dateB = new Date(b.month);
       return dateA.getTime() - dateB.getTime();
     });
 
     const labels = sorted.map(report => {
-      const [month, year] = report.month.trim().split(/\s+/);
-      return `${month.slice(0, 3)} ${year}`;
+      const [month, year] = report.month.split(' ');
+      return `${month.substring(0, 3)} ${year}`;
     });
 
     const incomeData = sorted.map(report => report.totalIncome || 0);
@@ -179,19 +180,86 @@ export default function ReportsPage() {
     ],
   };
 
-  // Simulate downloading CSV report
   const downloadCSVReport = () => {
-    // In a real app, this would generate and download a CSV file
     console.log('Downloading CSV report for', selectedMonth);
     alert('CSV Report downloaded!');
   };
 
-  // Simulate downloading PDF report
   const downloadPDFReport = () => {
-    // In a real app, this would generate and download a PDF file
     console.log('Downloading PDF report for', selectedMonth);
     alert('PDF Report downloaded!');
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <Skeleton width={200} height={32} />
+          <div className="flex items-center space-x-4">
+            <Skeleton width={208} height={36} />
+            <Skeleton width={100} height={36} />
+          </div>
+        </div>
+
+        {/* Monthly Summary Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <Card key={i}>
+              <div className="flex flex-col items-center">
+                <Skeleton width={120} height={24} className="mb-2" />
+                <Skeleton width={150} height={32} />
+              </div>
+            </Card>
+          ))}
+        </div>
+
+        {/* Monthly Comparison Chart Skeleton */}
+        <Card title={<Skeleton width={180} height={24} />}>
+          <div className="mb-4 flex justify-end">
+            <Skeleton width={120} height={32} />
+          </div>
+          <Skeleton height={300} />
+        </Card>
+
+        {/* Expense & Income Breakdown Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {[1, 2].map((i) => (
+            <Card key={i} title={<Skeleton width={160} height={24} />}>
+              <Skeleton height={256} />
+            </Card>
+          ))}
+        </div>
+
+        {/* Detailed Breakdown Table Skeleton */}
+        <Card title={<Skeleton width={180} height={24} />}>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-800">
+                <tr>
+                  {['Category', 'Type', 'Amount', '% of Total'].map((header) => (
+                    <th key={header} scope="col" className="px-6 py-3 text-left">
+                      <Skeleton width={80} height={20} />
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                {[1, 2, 3, 4].map((row) => (
+                  <tr key={row}>
+                    {[1, 2, 3, 4].map((cell) => (
+                      <td key={cell} className="px-6 py-4 whitespace-nowrap">
+                        <Skeleton width={cell === 1 ? 120 : 60} height={20} />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -214,15 +282,6 @@ export default function ReportsPage() {
 
           {/* Download buttons */}
           <div className="flex items-center space-x-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={downloadCSVReport}
-              className="flex items-center"
-            >
-              <DocumentTextIcon className="h-5 w-5 mr-1" />
-              CSV
-            </Button>
             <Button
               variant="secondary"
               size="sm"
@@ -401,4 +460,4 @@ export default function ReportsPage() {
       </Card>
     </div>
   );
-} 
+}
