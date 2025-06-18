@@ -424,7 +424,7 @@ export default function ReportsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card title="Expense Breakdown">
           {expenseCategories?.length > 0 ? (
-            <div className="h-64">
+            <div className="h-84">
               <ChartComponent
                 type="pie"
                 data={expensePieData}
