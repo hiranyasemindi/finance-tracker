@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
 import { Input, Select, FormGroup } from '@/components/form';
-import { mockUser } from '@/data/mockData';
 import { UserIcon, MoonIcon, SunIcon, CogIcon } from '@heroicons/react/24/outline';
 import { showToast } from 'nextjs-toast-notify';
 import { User } from '@/types';
@@ -114,6 +113,7 @@ export default function ProfilePage() {
             ...prev,
             preferredCurrency: value
           } : null);
+          localStorage.setItem('preferredCurrency', value);
           showToast.success(data.message, {
             duration: 3000,
             progress: true,
@@ -164,6 +164,7 @@ export default function ProfilePage() {
         }
         if (data.message) {
           setIsDarkMode(newDarkMode);
+          localStorage.setItem('isDarkMode', String(newDarkMode));
 
           // Also toggle dark mode class on document
           if (newDarkMode) {

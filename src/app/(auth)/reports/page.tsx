@@ -6,7 +6,7 @@ import Button from '@/components/Button';
 import { Select } from '@/components/form';
 import ChartComponent from '@/components/ChartComponent';
 import { Category, formatCurrency } from '@/types';
-import { ArrowDownTrayIcon, DocumentTextIcon, DocumentChartBarIcon } from '@heroicons/react/24/outline';
+import { DocumentChartBarIcon } from '@heroicons/react/24/outline';
 import { showToast } from 'nextjs-toast-notify';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';

@@ -61,6 +61,8 @@ export default function SignInPage() {
       console.log(session)
       if (session?.user?.id) {
         localStorage.setItem('userId', session.user.id);
+        localStorage.setItem('isDarkMode', String(session?.user?.isDarkMode));
+        localStorage.setItem('preferredCurrency', session?.user?.preferredCurrency ?? '');
       }
       showToast.success('Successfully signed in!', {
         duration: 3000,

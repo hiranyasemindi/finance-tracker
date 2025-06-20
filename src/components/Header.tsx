@@ -32,6 +32,16 @@ export default function Header({ toggleSidebar }: HeaderProps) {
   };
 
   useEffect(() => {
+    if(localStorage.getItem('isDarkMode') === 'true') {
+      setDarkMode(true);
+      document.documentElement.classList.add("dark");
+    } else {
+      setDarkMode(false);
+      document.documentElement.classList.remove("dark");
+    }
+  }, []); 
+
+  useEffect(() => {
     fetch('/api/profile', {
       method: 'GET',
       headers: {
@@ -52,11 +62,6 @@ export default function Header({ toggleSidebar }: HeaderProps) {
           });
           return;
         }
-        console.log(data)
-        if (data.isDarkMode) {
-          document.documentElement.classList.add("dark");
-        }
-        setDarkMode(data.isDarkMode)
         setUser(data)
       })
       .catch(error => {

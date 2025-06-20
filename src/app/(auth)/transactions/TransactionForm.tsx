@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import Button from '@/components/Button';
 import { Input, Select, TextArea, FormGroup } from '@/components/form';
-import { mockCategories, mockAccounts } from '@/data/mockData';
 import { Account, Category, Transaction } from '@/types';
 import { showToast } from 'nextjs-toast-notify';
 

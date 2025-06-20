@@ -166,15 +166,28 @@ export default function CategoriesPage() {
       .then(res => res.json())
       .then(data => {
         if (data.error) {
-          showToast.error(`Error deleting categories`, {
-            duration: 3000,
-            progress: true,
-            position: "top-right",
-            transition: "bounceIn",
-            icon: '',
-            sound: true,
-          });
           console.error('Error deleting category:', data.error);
+          
+          // Display a more user-friendly error message for foreign key constraints
+          if (data.type === "FOREIGN_KEY_CONSTRAINT") {
+            showToast.error(data.error, {
+              duration: 5000,
+              progress: true,
+              position: "top-right",
+              transition: "bounceIn",
+              icon: '',
+              sound: true,
+            });
+          } else {
+            showToast.error(`Error deleting category`, {
+              duration: 3000,
+              progress: true,
+              position: "top-right",
+              transition: "bounceIn",
+              icon: '',
+              sound: true,
+            });
+          }
         } else {
           showToast.success(`Category deleted successfully`, {
             duration: 3000,
@@ -186,7 +199,17 @@ export default function CategoriesPage() {
           });
           setCategories(categories.filter(c => c.id !== id));
         }
-      });
+      }).
+      catch(error =>
+        showToast.error(`Error deleting category`, {
+          duration: 3000,
+          progress: true,
+          position: "top-right",
+          transition: "bounceIn",
+          icon: '',
+          sound: true,
+        })
+      );
   };
 
   return (

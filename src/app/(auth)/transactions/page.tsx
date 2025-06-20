@@ -5,7 +5,6 @@ import Card from "@/components/Card";
 import Button from "@/components/Button";
 import DataTable from "@/components/DataTable";
 import { formatCurrency, Transaction } from "@/types";
-import { mockTransactions } from "@/data/mockData";
 import { PlusIcon, FunnelIcon } from "@heroicons/react/24/outline";
 import TransactionForm from "./TransactionForm";
 import { Input, Select, FormGroup } from "@/components/form";
@@ -158,6 +157,14 @@ export default function TransactionsPage() {
               t.id === editingTransaction.id ? transaction : t
             )
           );
+          showToast.success("Transaction updated successfully", {
+            duration: 3000,
+            progress: true,
+            position: "top-right",
+            transition: "bounceIn",
+            icon: "",
+            sound: true,
+          })
           setEditingTransaction(null);
           setIsFormOpen(false);
         })
@@ -260,6 +267,14 @@ export default function TransactionsPage() {
           return
         }
         setTransactions(transactions.filter((t) => t.id !== id));
+        showToast.success("Transaction deleted successfully", {
+          duration: 3000,
+          progress: true,
+          position: "top-right",
+          transition: "bounceIn",
+          icon: '',
+          sound: true,
+        });
       })
       .catch((error) => {
         console.error("Error deleting transaction:", error);
