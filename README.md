@@ -132,4 +132,4 @@ This application can be easily deployed to Vercel:
 
 ## License
 
-[MIT](LICENSE)
+[Custom License](LICENSE) - Personal use only. Commercial use and distribution are not permitted.
