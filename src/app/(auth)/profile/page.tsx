@@ -114,6 +114,7 @@ export default function ProfilePage() {
             ...prev,
             preferredCurrency: value
           } : null);
+          localStorage.setItem('preferredCurrency', value);
           showToast.success(data.message, {
             duration: 3000,
             progress: true,
@@ -164,6 +165,7 @@ export default function ProfilePage() {
         }
         if (data.message) {
           setIsDarkMode(newDarkMode);
+          localStorage.setItem('isDarkMode', String(newDarkMode));
 
           // Also toggle dark mode class on document
           if (newDarkMode) {
