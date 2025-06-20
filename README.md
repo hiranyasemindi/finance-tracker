@@ -1,6 +1,8 @@
 # Finance Tracker
 
-A personal finance manager built with Next.js that helps you track your income, expenses, and financial goals.
+A personal finance manager built with Next.js that helps you track your income, expenses, and financial goals. This project was created for learning Next.js and is not intended for production use with real financial data.
+
+> **Note:** Account balances and transaction data are not encrypted as this is not a real project. Do not use this application with real financial information.
 
 ## Features
 
@@ -20,7 +22,9 @@ A personal finance manager built with Next.js that helps you track your income, 
 - **Charts**: react-chartjs-2 + chart.js
 - **Icons**: Heroicons
 - **Forms**: react-hook-form
-- **Authentication**: NextAuth.js (setup ready, backend implementation required)
+- **Authentication**: NextAuth.js
+- **Database**: PostgreSQL (via Neon DB)
+- **Email Service**: RESEND
 - **State Management**: React Hooks, Context API
 - **Dark Mode**: Fully supported with toggle functionality
 
@@ -30,6 +34,8 @@ A personal finance manager built with Next.js that helps you track your income, 
 
 - Node.js (v18+)
 - npm or yarn
+- PostgreSQL database (Neon DB recommended)
+- RESEND account for email functionality
 
 ### Installation
 
@@ -46,14 +52,37 @@ A personal finance manager built with Next.js that helps you track your income, 
    yarn
    ```
 
-3. Run the development server:
+3. Set up environment variables:
+   Create a `.env` file in the root directory with the following variables:
    ```
-npm run dev
-# or
-yarn dev
-```
+   DATABASE_URL="your_neon_db_connection_string"
+   NEXTAUTH_SECRET="your_nextauth_secret"
+   NEXTAUTH_URL="http://localhost:3000"
+   RESEND_API_KEY="your_resend_api_key"
+   ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+4. Run the development server:
+   ```
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+
+### Setting up Neon DB
+
+1. Create an account at [Neon](https://neon.tech/)
+2. Create a new project
+3. Create a new database
+4. Get your connection string from the dashboard
+5. Replace the `DATABASE_URL` in your `.env` file with your Neon DB connection string
+
+### Setting up RESEND for Email Functionality
+
+1. Create an account at [RESEND](https://resend.com/)
+2. Create an API key
+3. Add the API key to your `.env` file as `RESEND_API_KEY`
 
 ## Project Structure
 
@@ -75,13 +104,18 @@ src/
 └── types/                  # TypeScript interfaces and types
 ```
 
-## Backend Integration
+## Database Schema
 
-The frontend is ready to be connected to a backend API. The following endpoints will be needed:
+The application uses Prisma ORM with a PostgreSQL database. The schema includes models for:
 
-- Authentication (signup, signin, password reset)
-- CRUD operations for transactions, categories, budgets, and accounts
-- Reports generation and analytics
+- Users
+- Accounts
+- Transactions
+- Categories
+- Budgets
+- Password Reset Tokens
+
+You can find the complete schema in the `prisma/schema.prisma` file.
 
 ## Customization
 
