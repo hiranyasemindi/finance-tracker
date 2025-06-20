@@ -41,7 +41,7 @@ A personal finance manager built with Next.js that helps you track your income, 
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/finance-tracker.git
+   git clone https://github.com/hiranyasemindi/finance-tracker.git
    cd finance-tracker
    ```
 
