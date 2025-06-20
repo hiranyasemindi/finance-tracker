@@ -2,7 +2,7 @@
 
 A personal finance manager built with Next.js that helps you track your income, expenses, and financial goals. This project was created for learning Next.js and is not intended for production use with real financial data.
 
-> **Note:** Account balances and transaction data are not encrypted as this is not a real project. Do not use this application with real financial information.
+> **Note:** Account balances and transaction data are not encrypted as this is a learning project. While you can use this application with Neon DB for personal usage, please be aware of the security limitations. If you choose to use it with real financial information, do so at your own risk and consider implementing additional security measures.
 
 ## Features
 
