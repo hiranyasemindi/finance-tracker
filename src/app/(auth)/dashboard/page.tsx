@@ -8,9 +8,6 @@ import {
   ArrowUpIcon,
   ArrowDownIcon,
   BanknotesIcon,
-  CreditCardIcon,
-  WalletIcon,
-  ChartBarIcon,
   CalendarIcon,
   ChevronDownIcon
 } from '@heroicons/react/24/outline';

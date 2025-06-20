@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
-import { mockAccounts } from '@/data/mockData';
 import { Account, formatCurrency } from '@/types';
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import AccountForm from './AccountForm';

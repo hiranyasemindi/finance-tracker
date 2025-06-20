@@ -5,7 +5,6 @@ import Card from "@/components/Card";
 import Button from "@/components/Button";
 import DataTable from "@/components/DataTable";
 import { formatCurrency, Transaction } from "@/types";
-import { mockTransactions } from "@/data/mockData";
 import { PlusIcon, FunnelIcon } from "@heroicons/react/24/outline";
 import TransactionForm from "./TransactionForm";
 import { Input, Select, FormGroup } from "@/components/form";
