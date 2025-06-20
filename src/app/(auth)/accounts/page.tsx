@@ -159,6 +159,27 @@ export default function AccountsPage() {
       .then(data => {
         if (data.error) {
           console.error('Error deleting account:', data.error);
+          
+          // Display a more user-friendly error message for foreign key constraints
+          if (data.type === "FOREIGN_KEY_CONSTRAINT") {
+            showToast.error(data.error, {
+              duration: 5000,
+              progress: true,
+              position: "top-right",
+              transition: "bounceIn",
+              icon: '',
+              sound: true,
+            });
+          } else {
+            showToast.error(`Error deleting account`, {
+              duration: 3000,
+              progress: true,
+              position: "top-right",
+              transition: "bounceIn",
+              icon: '',
+              sound: true,
+            });
+          }
         } else {
           setAccounts(accounts.filter(account => account.id !== id));
           showToast.success(`Account deleted successfully`, {
@@ -172,7 +193,6 @@ export default function AccountsPage() {
         }
       })
       .catch(error => {
-        console.error('Error deleting account:', error);
         showToast.error(`Error deleting account`, {
           duration: 3000,
           progress: true,
